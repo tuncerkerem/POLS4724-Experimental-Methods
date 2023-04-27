@@ -1,0 +1,46 @@
+---
+title: 'Experimental Methods: Problem Set 1'
+author: "Kerem Tuncer"
+date: "09/17/2021"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+## Question 1
+
+### Part A
+
+An experiment is a study that requires the random assignment of a treatment(s) to a group of participants and a control to another group of participants. As discussed in the textbook, a randomization procedure, such as a coin flip or the randomizr package, is required to determine whether a participant will receive a treatment. However, an observational study is one where the researcher does not manipulate any variables; instead, the researcher "observes" the measurements and tries to find a relationship. Hence, in an observational study, the researcher does not randomly assign participants to experimental conditions.
+
+Furthermore, a proper experimental study design may allow a researcher to determine causality in a relationship. Even though observational studies may suggest that there is a relationship between two variables, it is generally not sufficient to establish causality as they are prone to unobserved heterogeneity.
+
+### Part B
+
+The unmeasured variations/differences between subjects that are related to the observed outcome variables are known as unobserved heterogeneity. The conclusions drawn from observed data with unobserved heterogeneity may be biased if we do not control for it. Certain treatment effects could be overstated or understated. Therefore, researchers must always be cautious about the "distorting influence of unmeasured attributes of participants (pg. 4)."
+
+## Question 2
+
+This is an observational study. Given that there is no random assignment, neither by the researcher nor some government/institution, this study cannot be a field experiment or a naturally-occurring experiment. Likewise, we do not have enough knowledge about the criteria/threshold to have sanitary or unsanitary water. Therefore, we do not have enough information to consider whether this study can be a quasi-experiment. Instead, this is an observational study where the researcher cannot manipulate whether a village is sanitary/unsanitary but can "observe" the differences in the infant mortality rate between these two types of villages.
+
+
+## Question 3
+
+First of all, we know that only a random subset was offered the procedure to purchase. Hence, we can assume that random assignment did take place and that this is an experiment. The next step is to examine if the abstract agrees with the four criteria of field experiments.
+
+Authenticity of treatments: The treatment was the offering of a real "simplified procedure to purchase a household connection on credit" to those who did not have any private connection to the city grid. The treatment in this case is realistic in the sense that it resembles what an actual Moroccan household might experience when negotiating with a water company.
+
+Authenticity of participants: The participants were real Moroccan households who did not have a private water connection to the city water grid. Therefore, they do resemble the actors who might be ordinarily offered a deal by a Moroccan water company.
+
+Authenticity of the context: The context within which the subjects receive the treatment is not a laboratory setting. Instead it took place in a realistic context, in which a real water distribution company gave offers to real households in urban Morocco.
+
+Authenticity of outcomes: There were various outcomes of interest, such as quality of water, quantity of water, the incidence of waterborne illnesses, and time gains. All of these are realistic indicators of household welfare - which is what the researchers were interested in learning about.
+
+All in all, all of the four criteria seem to be fulfilled. Hence, I would call this is a field experiment.
+
+## Question 4
+
+It is reasonable to believe that parachutes are effective even in the absence of randomized experiments because the counterfactual outcome - which can either be death or life - is quite obvious. There is virtually no variability in outcomes for skydivers without parachutes.
+
+
+

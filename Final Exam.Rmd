@@ -1,0 +1,316 @@
+---
+title: "Final Exam"
+author: "Kerem Tuncer"
+date: "12/18/2021"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  word_document: default
+---
+
+## Question 1
+
+### Part A
+
+Within-subjects experiments are those where a single person or entity is tracked over time and random assignment determines when a treatment is administered. In contrast to between-subjects design, which tests the effect of an intervention by assigning N subjects to treatment or control and comparing outcomes in each group, within-subjects design assigns a single subject to periods of treatment or control and compares outcomes under each condition. The significance of within-subjects designs comes from the fact that they have the ability to generate precise treatment estimates with a single subject.  This is because individuals or entities are compared to themselves, which means that background attributes hold constant.  Likewise, over-time comparisons are made under controlled conditions, so that the principal source of over-time variation is the treatment.  I also would like to add that another significance of within-subject designs to the field of experimentation is their advantage in usually requiring less participants.
+
+
+### Part B
+
+Trimming bounds are a restrictive approach to estimate bounds on the treatment effect by trimming the observed data. Trimming bounds are designed to bracket the ATE among Always-Reporters, unlike its counterpart - extreme value bounds - that are suposed to bracked the sample ATE. An important part of the trimming bounds is the fact they require the monotonicity assumption. Furthermore, trimming bounds exclude some observed values and ignore missing outcomes, and they are unaffected by the logical range of potential outcomes. In my opinion, their significance comes from the fact that they are a possible solution when attrition is neither random, random conditional on X, nor confined to Never-Reporters, and the researchers need a way to extract some sort of inference from their data. Another significance has to do with the fact that trimming bounds may be more useful when the logical range of potential outcomes are too large, because trimming bounds will give a much narrower range.
+
+### Part C
+
+Treatment-by-covariate interactions refers to how treatment effects vary depending on covariates. In other words, it is a way to examine heterogenous treatment effects by examining the variation in ATEs from subgroup to subgroup. With the use of covariates, researchers can partition subjects into groups based on their individual attributes or on attributes of the context in which an experiment occurs. Then, the researchers can compute the conditional average treatment effect (CATE), which is the average treatment effect for a specific subgroup. Finally, the treatment-by-covariate interaction effect between a treatment and a covariate, will be the difference between the CATEs. There are two reasons why assessing treatment-by-covariate interactions is significant. Firstly, it allows the researcher to examine hypotheses about when and why treatment effects vary from subject to subject. Secondly, learning when treatment effects are more effective in a subgroup will allow policymakers/hospitals to more efficiently allocate a treatment.
+
+## Question 2
+
+A statistical technique for detecting heterogeneity is to test the null hypothesis that $Var(\tau_i) = 0$, meaning that variance of the treatment effect across subjects is statistically distinguishable from zero. However,  estimating Var(Ti) is impossible because we never observe the treatment effect for any particular individual. Instead, we observe the outcome for each person either in the treatment or in the control condition.
+
+Hence, to test the null hypothesis, we can compare treatment and control outcome variances. Under the null hypothesis of a constant treatment effect, the variances of the treated and untreated potential outcomes are equal $Var(Y_i(1)) = Var(Y_i(0))$. This is because
+
+$$Var(Y_i(1)) = Var(Y_i(0) + \tau_i) = Var(Y_i(0)) + Var(\tau_i)+2Cov(Y_i(0),\tau_i)$$
+and the equality $Var(Y_i(1)) = Var(Y_i(0))$ will hold when
+
+$$Var(\tau_i) = -2Cov(Y_i(0),\tau_i)$$
+Under the null hypothesis that $\tau_i$ is constant across subjects, both sides of the equation will be zero, $Var(\tau_i) = 0$ and $-2Cov(Y_i(0),\tau_i) = 0$. This is because the covariance between a variable and a constant is zero. Therefore, we can test the null by testing the implication that $Var(Y_i(1))=Var(Y_i(0))$.
+
+## Question 3
+
+### Part A
+
+First Round
+
+```{r}
+treatment.n <- 1082
+control.n <- 1032
+
+reporting.treatment <- 1005
+reporting.control <- 932
+
+reporting.treatment/treatment.n*100
+reporting.control/control.n*100
+```
+
+The reporting rate in treatment for the first round is 92.88%.
+The reporting rate in control for the first round is 90.31%.
+
+Second Round
+
+```{r}
+treatment.n <- 18
+control.n <- 24
+
+reporting.treatment <- 14
+reporting.control <- 22
+
+reporting.treatment/treatment.n*100
+reporting.control/control.n*100
+```
+
+The reporting rate in treatment for the second round is 77.78%.
+The reporting rate in control for the second round is 91.67%.
+
+### Part B
+
+Let's first bound the expected outcome in the treated group $E[Y_i|d_i = 1]$ by assuming that the missing outcomes take the smallest possible value $y^L$ or the largest possible value $y^D$.
+
+\begin{aligned}
+E[r_i|d_i = 1] * E[Y_i|d_i = 1, r_i = 1] + (1-E[r_i|d_i = 1]) * y^L \\
+\leq E[Y_i|d_i = 1] = E[Y_i(1)] \\
+\leq E[r_i|d_i = 1] * E[Y_i|d_i = 1, r_i = 1] + (1-E[r_i|d_i = 1]) * y^U
+\end{aligned}
+
+Using the same logic, we can write out the bounds for the expected outcome in the control group.
+
+\begin{aligned}
+E[r_i|d_i = 0] * E[Y_i|d_i = 0, r_i = 1] + (1-E[r_i|d_i = 0]) * y^L \\
+\leq E[Y_i|d_i = 0] = E[Y_i(0)] \\
+\leq E[r_i|d_i = 0] * E[Y_i|d_i = 0, r_i = 1] + (1-E[r_i|d_i = 0]) * y^U
+\end{aligned}
+
+
+Finally, we can form the lower bound on the ATE by subtracting the upper bound on the expected outcome under control from the lower bound on the expected outcome under treatment. The uppoer bound on the ATE is formed by subtracting the lower bound on the expected outcome under control form the upper bound on the expected bound on the expected outcome under treatment.
+
+\begin{aligned}
+E[r_i|d_i = 1] * E[Y_i|d_i = 1, r_i = 1] + (1-E[r_i|d_i = 1]) * y^L \\
+- (E[r_i|d_i = 0] * E[Y_i|d_i = 0, r_i = 1] + (1-E[r_i|d_i = 0]) * y^U) \\
+\leq E[Y_i|d_i = 1] - E[Y_i|d_i = 0] = E[Y_i(1)-Y_i(0)] \\
+E[r_i|d_i = 1] * E[Y_i|d_i = 1, r_i = 1] + (1-E[r_i|d_i = 1]) * y^U \\
+- (E[r_i|d_i = 0] * E[Y_i|d_i = 0, r_i = 1] + (1-E[r_i|d_i = 0]) * y^L) 
+\end{aligned}
+
+Now, let's plug in the numbers we have from the question.
+
+\begin{aligned}
+0.9288 * 13.07 + (1-0.9288) * 0 \\
+- (0.9031 * 12.94 + (1-0.9031) * 26) \\
+\leq 13.07 - 12.94 \\
+0.9288 * 13.07 + (1-0.9288) * 26 \\
+- (0.9031 * 12.94 + (1-0.9031) * 0) 
+\end{aligned}
+
+Finally, let's solve.
+
+```{r}
+#lower
+(0.9288*13.07) - (0.9031*12.94) - ((1-0.9031)*26)
+#upper
+(0.9288 * 13.07) + (1-0.9288)*26 - (0.9031 * 12.94)
+```
+
+We got the correct values of [-2.065, 2.305].
+
+### Part C
+
+To calculate the bounds in the second row of the table, the researchers used a slightly varied version of the equation I used in part B. Here is how it looks like in potential outcome notation.
+
+\begin{aligned}
+E[r_i|d_i = 1]*E[Y_i|d_i = 1, r_i = 1] + (1-E[r_i|d_i = 1]) \\
+*(E[s_i|d_i = 1, f_i = 1]*E[Y_i|d_i = 1, f_i = 1, s_i = 1] \\
++(1-E[s_i|d_i = 1, f_i = 1])*y^L) \\
+-[E[r_i|d_i = 0]*E[Y_i|d_0 = 1, r_i = 1] + (1-E[r_i|d_i = 0]) \\
+*(E[s_i|d_i = 0, f_i = 1]*E[Y_i|d_i = 0, f_i = 1, s_i = 1] \\
++(1-E[s_i|d_i = 0, f_i = 1])*y^U)] \\
+\leq E[Y_i|d_i = 1] - E[Y_i|d_i = 0] = E[Y_i(1)-Y_i(0)] \\
+\leq E[r_i|d_i = 1]*E[Y_i|d_i = 1, r_i = 1] + (1-E[r_i|d_i = 1]) \\
+*(E[s_i|d_i = 1, f_i = 1]*E[Y_i|d_i = 1, f_i = 1, s_i = 1] \\
++(1-E[s_i|d_i = 1, f_i = 1])*y^U) \\
+-[E[r_i|d_i = 0]*E[Y_i|d_0 = 1, r_i = 1] + (1-E[r_i|d_i = 0]) \\
+*(E[s_i|d_i = 0, f_i = 1]*E[Y_i|d_i = 0, f_i = 1, s_i = 1] \\
++(1-E[s_i|d_i = 0, f_i = 1])*y^L)]
+\end{aligned}
+
+Now, let's dissect what is going on in the inequality above. Firstly, there are two terms that we need to define. $s_i$ denotes whether subject i's outcome is observed in the second round. $f_i$ denotes whether subject i was randomly assigned to the second round.
+
+We can separate the above formula into four pieces; the upper and the lower bounds on the expected outcomes in the treatment group and the upper and the lower bounds on the expected outcomes in the control group. Each of these pieces are calculated in a very similar manner.
+
+First, let's take a look at the lower bound on the expected outcome in the treatment group. This value is computed as a weighted average of three subgroups; treated subjects who reported outcomes in the first round, treated subjects who did not report outcomes in the first round but reported outcomes in the second round, and treated subjects who did not report outcomes in neither of the two rounds. The weight of the treated subjects who reported outcomes is equal to the reporting rate in the first round among treated subjects (which is basically the proportion of treated subjects who reported outcomes in the first round to the treatment group size). The weight of the treated subjects who did not report outcomes in the first round but reported outcomes in the second round is the non-reporting rate in the first round among the treated subjects times the reporting rate in the second round among the treated subjects (which is basically the proportion of those who did not report initially but reported in the 2nd round to the treatment group size). Using the distributive property of multiplication over addition, we can define the the weight of the "hardcore" unmeasurable subjects as the non-reporting rate in the first round among treated subjects times the non-reporting rate in the second round among treated subjects (which is basically the proportion of the hardcore subjects to the treatment group size). Then, we multiply the first weight by the average treated outcome among treated subjects who reported outcomes in the first round. We multiply the second weight by the average treated outcome among treated subjects who did not report outcomes in the first round but reported outcomes in the second round. Lastly, we multiply the third weight by the smallest possible value $y^L$ (given that this is the lower bound) in outcomes.
+
+The upper bound on the expected outcome in the treatment group is computed the same way, except we change $y^L$ with $y^U$ which is the largest possible value.
+
+Then, let's take a look at the lower bound on the expected outcome in the control group. This value is computed as a weighted average of three subgroups; untreated subjects who reported outcomes in the first round, untreated subjects who did not report outcomes in the first round but reported outcomes in the second round, and untreated subjects who did not report outcomes in neither of the two rounds. The weight of the untreated subjects who reported outcomes is equal to the reporting rate in the first round among untreated subjects (which is basically the proportion of untreated subjects who reported outcomes in the first round to the control group size). The weight of the untreated subjects who did not report outcomes in the first round but reported outcomes in the second round is the non-reporting rate in the first round among the untreated subjects times the reporting rate in the second round among the untreated subjects (which is basically the proportion of those who did not report initially but reported in the 2nd round to the control group size). Using the distributive property of multiplication over addition, we can define the the weight of the "hardcore" unmeasurable subjects as the non-reporting rate in the first round among untreated subjects times the non-reporting rate in the second round among untreated subjects (which is basically the proportion of the hardcore subjects to the control group size). Then, we multiply the first weight by the average untreated outcome among untreated subjects who reported outcomes in the first round. We multiply the second weight by the average untreated outcome among untreated subjects who did not report outcomes in the first round but reported outcomes in the second round. Lastly, we multiply the third weight by the smallest possible value $y^L$ (given that this is the lower bound) in outcomes.
+
+The upper bound on the expected outcome in the control group is computed the same way, except we change $y^L$ with $y^U$ which is the largest possible value.
+
+Finally, the lower bound of the sample ATE is computed by subtracting the upper bound on the expected outcome under control from the lower bound on the expected outcome under treatment. Likewise, the upper bound of the sample ATE is computed by subtracting the lower bound on the expected outcome under control from the upper bound on the expected outcome under treatment. In conclusion, we expect the sample ATE to be between these two bounds.
+
+### Part D
+
+As a whole, the extreme value bounds for both the first round and the second round of outcome measurement are measuring the same estimand. They are both estimating a range between two bounds that is supposed to bracket the sample ATE. According to the first round, we estimate the sample ATE to be between -2.065 and 2.305. According to both the first round and the second round, we estimate the sample ATE to be between -0.193 and 0.429.
+
+The width of the extreme value bounds decreases in the second round estimation, which also reduces the range of uncertainty about the possible consequences of attrition. This is because we can use the average observed outcome from the second round subjects estimate $E[Y_i(0)|R_i(0) = 0]$ and $E[Y_i(1)|R_i(1) = 0]$ in an unbiased manner. We can use the average observed treated outcome from the second round subjects to fill for the treated outcome of treated subjects who attritted in the first round. Likewise, we can use the average untreated outcome from the second round subjects to fill for the untreated outcome of untreated subjects who attritted in the first round. As a consequence, to calculate the upper and lower bounds, we only need to swap in the largest and smallest possible outcomes for only the "hardcore" unmeasureable subjects that attritted in both rounds of data collection. Given that the percentage of the "hardcore" unmeasurable subject will be low, we will only need to fill in outcomes with extreme values for very few subjects.
+
+Valid second-round extreme value bound estimates require two things. Firstly, the procedures used to measure outcomes and the context within which measurements are gathered are as similar as possible to the initial round of data collection. Secondly, if not all of the first-round attritters are contacted, then the subjects chosen for the follow-up must be from a random sample.
+
+
+## Question 4
+
+### Part A
+
+Both of these estimators are measuring the same estimand the is the complier average causal effect (CACE), which is the average treatment effect among compliers. In this scenario, this estimand refers to the average treatment effect amoong respondents who indicated they attended at least one of the screenings. This is because the placebo group was also assigned to watch an unrelated video, which could only be seen if one were to attend at least one of the screenings.
+
+### Part B
+
+Both of these estimators will have the same assumptions given that they are trying to estimate the CACE. The first assumption for these estimators is the non-interference assumption. This assumption states that the potential outcomes for each individual are unaffected by the assignment or treatment of any other individual. This assumption will be violated if subjects' potential outcomes change depending on whether a nearby village is treated. For example, this assumption could have been violated if people living in treated villages routinely visited untreated villages.
+
+The second assumption is the exclusion restriction, which states that the effect of the treatment assignment on potential outcomes occurs due to the treatment itself; the effect is not transmitted through any other channel. Violations of the exclusion restriction could lead us to systematically over- or underestimate the CACE of the anti-violence video treatment. For example, this assumption could have been violated if treated villages also received some type of training from anti-violence groups.
+
+Given that this scenario shows one-sided non-compliance, we do not need to worry about the monotonicity assumption. Likewise, the random assignment assumption is also necessary, however, attrition is not mentioned in the question. Therefore, there is no reason to believe that subjects' potential outcomes predict whether they drop out of the study and that results may be biased.
+
+### Part C
+
+The result from the first regression can be achieved by subtracting the average score on the willingness-to-report index among respondents who attended at least one film and lived in a placebo village from the average score on the willingness-to-report index among respondents who attended at least one film and lived in a treatment village.
+
+```{r}
+0.4333 - 0.3835
+```
+
+The result from the second regression requires two steps. First, we have to estimate the ITT_D, which is the proportion of subjects who are treated in the event that they are assigned to the treatment group, minus the proportion who would have been treated even if they had instead been assigned to the control group. The second part is zero.
+
+```{r}
+ITT_D <- (506/2332)
+```
+
+Then, to compute the ITT, we have to subtract the average score of those that were assigned to the control group from the average score of those that were assigned to the treatment. We can do this by using weighted averages.
+
+```{r}
+mean.1 <- ((506*0.4333) + (1826*0.3799)) / 2332
+mean.0 <- (650*0.3835 + 2552*0.3780) / (650+2552)
+ITT <- mean.1 - mean.0
+```
+Finally, we divide the ITT by the ITT_D.
+
+```{r}
+CACE <- ITT/ITT_D
+CACE
+```
+Our results match.
+
+### Part D
+
+```{r}
+0.0473058  / 0.017411  
+```
+We can see that the standard error from the OLS regression of the willingness-to-report index (Y) on exposure to the anti-violence videos (D), for the subset of respondents who attended at least one film is approximately three times smaller than the standard error from the instrumental variables regression. Therefore, the advantage of the OLS regression with the complier subset is that it can estimate the CACE with more precision compared to the instrumental variables regression.
+
+### Part E
+
+This experimental design is already an example of a placebo design, which decreases statistical uncertainty. Therefore, modifications in the experimental design that would improve the precision of the estimator would be to increase the number of participants or to come up with a treatment or a treatment administration strategy that would increase the proportion of compliers. A larger sample size and a higher complier rate would both improve the precision of the instrumental variables estimator.
+
+
+## Question 5
+
+### Part A
+
+The sample() function takes a sample of the specified size from the elements of a vector using either with or without replacement. In the sample(cluster) scenario, neither the size nor the replacement is specified, meaning that the size will be equal to the inputted vector and there will be no repeated values. Hence, sample(cluster) simply randomizes the order of the cluster identification values.
+
+### Part B
+
+```{r}
+table(data$Y0)
+```
+
+
+In the first simulation, Y_0 only consists of zeroes. Therefore, all values of Y_0 are uniformly distributed in a single value.
+
+```{r}
+hist(data$Y1)
+sd(data$Y1)
+```
+
+On the other hand, the Y_1 values start from 0.001 and go up until 1.999 by adding 0.002. Therefore, the Y_1 values from the first simulation are also uniformly distributed between 0 and 2 with a standard deviation of 0.58.
+
+### Part C
+
+```{r}
+treatment_clusters <- data[data$d == 1,]
+length(unique(treatment_clusters$cluster)) / 40 * 100 #50%
+```
+
+50% of the 40 clusters is assigned to treatment.
+
+### Part D
+
+The bias we computed for the first simulation is 0.001463632. The magnitude of this bias is extremely small. Bias of that level is too negligible to worry about. Therefore, we can say that the regression estimator of the ATE in the first simulation is unbiased.
+
+### Part E
+
+The bias we computed for the second simulation with balanced design is 0.02332426 and the bias for the second simulation with unbalanced design is 0.1673502. Both of these biases are much greater in magnitude in comparison to the bias we computed for the first simulation. Therefore, there is evidence of bias in both of these scenarios, especially when using an unbalanced design.
+
+### Part F
+
+The bias we computed for the third simulation is 0.01067265. Given that this comparison uses a balanced design, it makes more sense to compare it to simulation 2a that also used a balanced design. The bias in this simulation is approximately half of the bias in simulation 2a. Therefore, increasing the sample size and the number of clusters seem to have decreased the bias.
+
+### Part G
+
+The bias we computed for the fourth simulation is 0.02256496. This bias is approximately twice that of the bias we computed for the third simulation and approximately the same as the one we computed for simulation 2a. Hence, the bias diminished very slightly compared to simulation 2a but was larger than the one in the third simulation. This means that increasing the sample size but holding the number of clusters constant has very minimal - almost none - improvement in diminishing the bias.
+
+### Part H
+
+The bias we computed for the fifth simulation is -0.0008656094. The magnitude of this bias is extremely small. Bias of that level is too negligible to worry about. It is even smaller than the one we computed for the first simulation. Therefore, we can say that the regression estimator of the ATE in the fifth simulation is unbiased.
+
+### Part I
+
+The bias we computed for the sixth simulation 0.1623107. The magnitude of this bias is pretty high compared to all the other simulations we have done. Therefore, we can see evidence of bias for an unbalanced design even with constant treatment effects.
+
+### Part J
+
+```{r}
+abs(0.001463632 - 0.001478745)
+abs(0.02332426 - 0.0230885)
+abs(0.1673502 - 0.1665081)
+abs(0.01067265- 0.01095272)
+abs(0.02256496 - 0.02296176)
+abs(-0.0008656094 + 7.207377e-05)
+abs(0.1623107 - 0.1635345)
+```
+
+The bias formula tracks the simulated bias found for each scenario very closely. The differences between the simulated bias and the analytically computed bias are extremely small.
+
+It is true that bias is not a concern for balanced designs with constant treatment effects. This is because the bias under constant treatment effect and a balanced design was -0.0008656094, which is negligible enough to consider it as unbiased even when cluster size is not independent of potential outcomes.
+
+## Extra Credit
+
+Let's compare pairs of simulations where all the variables are the same except one.
+
+The only difference between simulation 1 and 2a is the fact that the cluster size is independent of potential outcomes in the former and dependent on the latter. Given that simulation 1's standard error is much lower, we can infer that having a cluster size independent of potential outcomes improves the precision of the estimation of the ATE.
+
+The only difference between simulation 2a and 2b is the fact that the design is balanced in the former and unbalanced on the latter. Given that simulation 2a's standard error is much lower, we can infer that having a balanced design improves the precision of the estimation of the ATE.
+
+The only difference between simulation 3 and 4 is the fact that the size of the clusters are bigger in the former and smaller in the latter. Given that simulation 3's standard error is much lower, we can infer that having a larger cluster size improves the precision of the estimation of the ATE.
+
+The only difference between simulation 2a and 5 is the fact that the former has non-constant treatment effect, whereas the latter has a constant treatment effect. Given that simulation 2a's standard error is much lower, we can infer that having a non-constant treatment effect improves the precision of the estimation of the ATE.
+
+THe only difference between simulation 2a and 4 is the fact that the former has a smaller sample size, whereas the latter has a larger sample size. Given that their standard errors are almost the same, the sample size of the experiment does not play a significant role in improving the precision of the estimation of the ATE.
+
+In conclusion, having a cluster size independent of potential outcomes, balanced design, larger cluster size, and a non-constant treatment effect will improve the precision of the estimation of the ATE.
+
+
+
+
+
+
+
+

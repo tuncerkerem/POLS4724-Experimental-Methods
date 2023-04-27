@@ -1,0 +1,574 @@
+---
+title: "Problem Set 8"
+author: "Kerem Tuncer"
+date: "12/05/2021"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+## Question 1
+
+### Part A
+
+In this expression, the bold d represents a vector to indicate which subjects receive the treatment. With this knowledge in mind, this expression declares that the potential outcomes for subject i respond only to the subjects own treatment status, d, not the treatments administered to other subjects. This expression conveys the non-interference assumption because the treatment status of other subjects do not "interfere" with the potential outcomes of subject i (whose potential outcomes are only dependent on his/her own treatment status.)
+
+### Part B
+
+In this case, the risk of the spillover is coming from the proximity of the units. If we have some areas, such as villages, that are close to one another, then we can assume that assigning one of those units to the treatment condition will most likely cause spillovers to the units that are close to that treated unit. Therefore, there is an implicit clustered assignment, in which clusters are formed by all the units that are close enough to get affected by a treatment to a neighboring unit.
+
+### Part C
+
+When we have within-subjects design, the unit of analysis is not the different subjects but the different periods. In this case, there could be different ways that the non-interference assumption is violated. One example would be the persistence of treatment effects over time. For example, if I were to be treated in period 1, but there are some lingering effects in period 2, then the fact that I was treated in period 1 will affect my potential outcomes in the second period. Another way the assumption could be violated is when there is an anticipation effect. If I know that I will be treated, then my potential outcome will change because I will start behaving differently.
+
+### Part D
+
+One attractive property of waitlist designs is their ability to extract statistically meaningful estimates from relatively small numbers of subjects. Given that only small number of subjects are necessary, this design is especially useful in research projects with not enough financial resources.
+
+Another attractive property is that both within-subject and between-subject comparisons are possible given that every subject is treated eventually.
+
+Lastly, because each subject switches randomly from control to treatment condition in different time points, it is possible to examine time effects. For example, it is possible to study how repeated or long-term exposure to experimental treatment affects the efficiency of the treatment.
+
+## Question 2
+
+The scenario described first is not an experiment; instead, it is a survey that does not have random assignment. Therefore, it includes a lot of student pairs that have chosen to be roommates because of their past friendship. From my personal experience, roommates that chose themselves tend to have more similar background characteristics, including eating habits and sports habits.
+
+However, the second scenario has an element of randomization because the students are randomly paired to be roommates. Therefore, they will not have similar background characteristics, which means that they will have different eating habits and sports habits.
+
+In conclusion, the lack of randomization in the first scenario includes self-selected roommates who are more likely to have correlated weights at the end of the semester. Meanwhile, the random assignment of roommates makes it so that there are no correlations between their weight at the end of the year. Given that the second scenario has an aspect of randomization, the finding of no correlation between two roommates' weights appears to be a more supported conclusion.
+
+## Question 3
+
+### Part A
+
+In this scenario, spillover is still a possibility between students in the same classroom. For example, the treatment effect on a subject may be amplified or reduced because of his/her interaction with other treated subjects in the same classroom.
+
+However, the clustered random assignment makes it so that the level of interaction between the treated subjects and the control subjects is minimal because random assignment is done at a classroom level and students interact the most with people in their clasroom.
+
+With this knowledge in mind, we can state the non-interference assumption by permitting spillovers within classrooms. The potential outcomes for subject i respond only to the the subject's classroom treatment status, not the treatments administered to other subjects in other classrooms.  This means that the treatment status of subjects in other classrooms do not "interfere" with the potential outcomes of subject i (whose potential outcomes are only dependent on his/her own classroom's treatment status).
+
+### Part B
+
+The estimand in this question is the treatment effect between students who are treated and have treated classmates and students who are untreated and have untreated classmates. In this example, the non-interference assumption is not violated by within classroom spillovers because the experimental design accommodates the expanded schedule of potential outcomes. Hence, this causal estimand includes spillovers within classrooms, which means that the non-interference assumption will not be violated from within-classroom spillovers.
+
+## Question 4
+
+### Part A
+
+Let's revisit the Camerer study. In that study, two horses with the same odds were selected in each race, and one of them was given the treatment. With this knowledge in mind, there are two potential outcomes. The first is $Y_{i01}$ meaning that the horse i was treated and her pair was untreated. The second is $Y_{i10}$ meaning that the horse i was untreated and her pair was treated.
+
+Therefore, the potential outcomes for horse i respond only to that horse's treatment status, not the treatment administered to the paired horse.  This means that the treatment status of the paired horse does not "interfere" with the potential outcome of horse i (whose potential outcomes are only dependent on his/her own treatment status).
+
+### Part B
+
+The causal parameter in this question is the treatment effect between horses who are treated and have an untreated pair and horses who are untreated and have a treated pair.
+
+## Question 5
+
+### Part A
+
+Let's first define all the possible potential outcomes.
+
+Those who received mail in a zip-code where none of the households received mail would have $Y_i(d_i=1, D = 0)$. This is unobserved.
+
+Those who did not receive mail in a zip-code where none of the households received mail would have $Y_i(d_i = 0, D = 0)$. This is observed.
+
+Those who received mail in a zip-code where half of the households received mail would have $Y_i(d_i=1, D = 0.5)$. This is observed.
+
+Those who did not receive mail in a zip-code where half of the households received mail would have $Y_i(d_i = 0, D = 0.5)$. This is observed.
+
+Those who received mail in a zip-code where all of the households received mail would have $Y_i(d_i=1, D = 1)$. This is observed.
+
+Those who did not receive mail in a zip-code where all of the households received mail would have $Y_i(d_i = 0, D = 1)$. This is unobserved.
+
+With this knowledge in mind, the treatment effect of receiving mail addressed to subject i will be the following;
+
+$$Y_i(d_i=1, D = 1) - Y_i(d_i=0, D = 0) $$
+## Part B
+
+The difference between $Y_i(d_i=0, D = 1)$ and $Y_i(d_i=0, D = 0)$ indicates the spillover effect on those who receive no mail but whose ZIP code receive mail. This is unobserved.
+
+The difference between $Y_i(d_i=0, D = 0.5)$ and $Y_i(d_i=0, D = 0)$ indicates the spillover effect on those who receive no mail but whose ZIP code receive mail.  This is observed.
+
+The difference between $Y_i(d_i=1, D = 1)$ and $Y_i(d_i=1, D = 0)$ indicates the spillover effect among those who receive mail themselves. This unobserved.
+
+The difference between $Y_i(d_i=1, D = 1)$ and $Y_i(d_i=1, D = 0.5)$ indicates the spillover effect among those who receive mail themselves. This is observed.
+
+### Part C
+
+The difference-in-means estimator I am proposing for the indirect effect is the following;
+
+$$E[Y_i(d_i=1, D = 1) - Y_i(d_i=0, D = 0)]$$
+
+The difference-in-means estimator I am proposing for the direct effect is the following;
+
+$$E[Y_i(d_i=1, D = 0.5) - Y_i(d_i=0, D = 0.5)]$$
+
+They both assume that there are no within-household spillovers, which is true because we are only looking at single-voter households. Likewise, both involve randomly assigned groups of approximately equal size.
+
+### Part D
+
+```{r}
+(620/2949) - (526/3316)
+```
+The direct effect was 0.05. Therefore, the treatment increased turnout by 5 percentage points.
+
+```{r}
+n.0.0 <- 6217
+n.1.1 <- 6377
+outcome.0.0 <- 1021 / n.0.0
+outcome.1.1 <- 1316 / n.1.1
+
+outcome.1.1 - outcome.0.0
+```
+The indirect effect was 0.04. Therefore, the treatment increased turnout by 4 percentage points. The magnitude of the direct effect was higher by 1 percentage point than the magnitude of the indirect effect.
+
+## Question 6
+
+### Part A
+
+In this scenario, the villages that produce the Y_01 outcome will be Village 1. Likewise, the villages that produce the Y_00 outcome will be Villages 3, 4, 5.
+
+```{r}
+village1 <- (0/0.2)/(1/0.2)
+village3_4_5 <- (0/0.4 + 6/0.6 + 6/0.8)/(1/0.4 + 1/0.6 + 1/0.8)
+village1 - village3_4_5
+```
+
+The estimated $E[Y_{01}-Y_{00}]$ will be -3.230769.
+
+### Part B
+
+In this scenario, the villages that produce the Y_10 outcome will be Village 2. Likewise, the villages that produce the Y_00 outcome will be Villages 3, 4, 5. However, Village 5 has a zero probability of expressing a spillover potential outcome, so we will exclude it.
+
+```{r}
+village2 <- (2/0.4)/(1/0.4)
+village3_4 <- (0/0.4 + 6/0.6) / (1/0.4 + 1/0.6)
+village2 - village3_4
+```
+The estimated $E[Y_{10}-Y_{00}]$ will be -0.4.
+
+### Part C
+
+In this scenario, the villages that produce the Y_01 outcome will be Village 1. Likewise, the villages that produce the Y_00 outcome will be Villages 3 and 4.
+
+```{r}
+village1 - village3_4
+```
+The new estimated $E[Y_{01}-Y_{00}]$ will be -2.4.
+
+## Question 7
+
+### Part A
+
+```{r}
+Y_1i <- (1+1+1) / 4
+Y_0i <- (1+1) / 4
+Y_1i - Y_0i
+```
+
+The average treatment effect for $Y_{1i}-Y_{0i}$ is 0.25.
+
+```{r}
+Y_2i <- 1 / 4
+Y_2i - Y_0i
+
+```
+
+The average treatment effect for $Y_{2i}-Y_{0i}$ is -0.25.
+
+### Part B
+
+This answer depends on what we mean by pairing.
+
+```{r}
+factorial(4)/(factorial(2)^2* factorial(2))
+```
+There are 3 possible pairings when we do not consider the treatment and control groups.
+
+```{r}
+choose(4,2)
+```
+
+Six different random pairings are possible if we consider whether the pair is in the control or the treatment group.
+
+### Part C
+
+When 1 and 2 are in the treatment group, and 3/4 is in the control group.
+
+```{r}
+ate1 = 1 - 0.5
+```
+
+When 1 and 3 are in the treatment group, and 2/4 is in the control group.
+
+```{r}
+ate2 = 0 - 1
+```
+
+When 1 and 4 are in the treatment group, and 2/3 is in the control group.
+
+```{r}
+ate3 = 0.5 - 0.5
+```
+
+When 2 and 3 are in the treatment group, and 1/4 is in the control group.
+
+```{r}
+ate4 = 0 - 0.5
+```
+
+When 2 and 4 are in the treatment group, and 1/3 is in the control group.
+
+```{r}
+ate5 = 0.5 - 0
+```
+
+When 3 and 4 are in the treatment group, and 1/2 is in the control group.
+
+```{r}
+ate6 = 0.5 - 0.5
+```
+
+```{r}
+mean(c(ate1, ate2, ate3, ate4, ate5, ate6))
+```
+The average difference-in-means estimate will be -0.08333333. This number does not correspond to the two estimands we found in part A. It also does not correspond to the average of the two estimands.
+
+### Part D
+
+Out of six possible pairings, four of them include communication between a persuasive subject and an unpersuasive subject. So, the probability of such an event is 4/6, which is 66.67%
+
+Out of six possible pairings, one of them includes communication between an unpersuasive subject and an unpersuasive subject. So, the probability of such an event is 1/6, which is 16.67%
+
+### Part E
+
+It leads to a biased difference-in-means estimate because the probability of communication between a persuasive & unpersuasive subject is different than than the probability of communication between two unpersuasive subjects.
+
+### Part F
+
+The bias would not be eliminated because the probabilities would not change under such a replication.
+
+### Part G
+
+The bias would not be eliminated because the probabilities would not change under such a replication, as well.
+
+## Question 8
+
+### Part A
+
+There are a total of four potential outcomes.
+
+The first one is when both vignettes show black people. I will call this $Y_{11}$.
+
+The second one is when both vignettes show white people. I will call this $Y_{00}$.
+
+The third one is when the first vignette shows a white person and the second vignette shows a black person. I will call this $Y_{01}$.
+
+The fourth one is when the first vignette shows a black person and the second vignette shows a white person. I will call this $Y_{10}$.
+
+### Part B
+
+The difference between Y10 and Y00 defines the causal effect of being first shown a black person vs a white person while the second vignette shows a white person.
+
+The difference between Y11 and Y01 defines the causal effect of being first shown a black person vs a white person while the second vignette shows a black person.
+
+The difference between Y01 and Y00 defines the causal effect of being shown a black person vs a white person in the second vignette while the first vignette shows a white person.
+
+The difference between Y11 and Y10 defines the causal effect of being shown a black person vs a white person in the second vignette while the first vignette shows a black person.
+
+The difference between Y11 and Y00 defines the causal effect of being shown two vignettes of black people versus two vignettes of white people.
+
+The researcher has the data to estimate all of the above-mentioned average treatment effects.
+
+### Part C
+
+Because the vignettes are randomly assigned, the researchers can use the average values of Y10, Y00, Y11, and Y01 to estimate the average treatment effects. Therefore, we can identify a total of 5 different ATEs to estimate.
+
+For the causal effect of being first shown a black person vs a white person while the second vignette shows a white person;
+
+$$E[Y_{10} - Y_{00}]$$
+For the causal effect of being first shown a black person vs a white person while the second vignette shows a black person;
+
+$$E[Y_{11} - Y_{01}]$$
+For the causal effect of being shown a black person vs a white person in the second vignette while the first vignette shows a white person;
+
+$$E[Y_{01} - Y_{00}]$$
+For the causal effect of being shown a black person vs a white person in the second vignette while the first vignette shows a black person;
+
+$$E[Y_{11} - Y_{10}]$$
+For the causal effect of being shown two vignettes of black people versus two vignettes of white people;
+
+$$E[Y_{11} - Y_{00}]$$
+
+### Part D
+
+This should be a sound approach because the random assignment procedure makes it so that a white participant has the same chance of being in any of the four experimental groups as a black participant. Therefore, it would be acceptable to sum the four outcomes separately for black participants and for white participants and then find the difference. However, the researcher should note this in the explanation.
+
+## Question 9
+
+### Part A
+
+```{r}
+# Data are from Table 8-4 and 8-5
+hotspots <- read.csv("Problem 8.9 Table 8-4 and 8-5.csv", stringsAsFactors=FALSE)
+
+
+#### Problem 8.9a ####
+
+true_ate <- with(hotspots, mean(y01[prox500==0]) - mean(y00[prox500==0]))
+true_ate
+ate_hat <- with(hotspots, mean(y[prox500==0 & assignment==1]) - 
+                  mean(y00[prox500==0 & assignment==0]))
+ate_hat
+```
+
+The true ATE of E[Y01-Y00] is -5, which we were able to calculate because we have the full schedule of potential outcomes. However, with the observed outcomes, our estimated ATE of E[Y01-Y00] is 3.333 for immediate police surveillance.
+
+### Part B
+
+```{r}
+true_ate_01 <- with(hotspots, mean(y01[prox500==1]) - mean(y00[prox500==1]))
+true_ate_10 <- with(hotspots, mean(y10[prox500==1]) - mean(y00[prox500==1]))
+true_ate_11 <- with(hotspots, mean(y11[prox500==1]) - mean(y00[prox500==1]))
+true_ate_01
+true_ate_10
+true_ate_11
+
+hotspots <- within(hotspots,{
+  exposure[exposure == 11] <- "11"  # Indirect and Direct Treatment
+  exposure[exposure == 10] <- "10"  # Indirect Treatment
+  exposure[exposure == 01] <- "01"  # Direct Treatment
+  exposure[exposure == 00] <- "00"  # Control
+  
+  # Calculate probability of assignment to exposure condition
+  Q <- NA
+  Q[exposure == "11"] <- prob11[exposure == "11"]
+  Q[exposure == "10"] <- prob10[exposure == "10"]
+  Q[exposure == "01"] <- prob01[exposure == "01"]
+  Q[exposure == "00"] <- prob00[exposure == "00"]
+  
+  # Generate weights
+  weights <- 1/Q
+})
+
+# Estimate E[Y_{01} - Y_{00}]:
+fit.01 <- lm(y ~ exposure, weights=weights, 
+             subset(hotspots, prox500 > 0 & exposure %in% c("00", "01")))
+
+fit.01$coefficients
+
+# Estimate E[Y_{10} - Y_{00}]:
+fit.10 <- lm(y ~ exposure, weights=weights, 
+             subset(hotspots, prox500 > 0 & exposure %in% c("00", "10")))
+
+fit.10$coefficients
+
+# Estimate E[Y_{11} - Y_{00}]:
+fit.11 <- lm(y ~ exposure, weights=weights, 
+             subset(hotspots, prox500 > 0 & exposure %in% c("00", "11")))
+
+fit.11$coefficients
+
+```
+
+The true ATE of E[Y01-Y00] is -5, which we were able to calculate because we have the full schedule of potential outcomes. However, with the observed outcomes, our estimated ATE of E[Y01-Y00] is -16.03258 for immediate police surveillance.
+
+The true ATE of E[Y10-Y00] is 5, which we were able to calculate because we have the full schedule of potential outcomes. However, with the observed outcomes, our estimated ATE of E[Y10-Y00] is -0.03702306 for immediate police surveillance.
+
+The true ATE of E[Y11-Y00] is -7, which we were able to calculate because we have the full schedule of potential outcomes. However, with the observed outcomes, our estimated ATE of E[Y11-Y00] is -9.605768 for immediate police surveillance.
+
+
+### Part C
+
+```{r}
+#### Problem 8.9c ####
+rm(list=ls())
+library(foreign)
+hotspot_nonexp <- read.dta("Problem 8.9 Hotspots Nonexperimental.dta")
+
+hotspot_nonexp <- within(hotspot_nonexp,{
+  exposure[exposure==10] <- "10"
+  exposure[exposure==0] <- "00"
+  
+  Q <- NA
+  Q[exposure=="10"] <- prob10[exposure=="10"]
+  Q[exposure=="00"] <- prob00[exposure=="00"]
+  
+  weights <- 1/Q
+})
+
+fit.nonexp <- lm(y ~ exposure, weights=weights, 
+                 data=subset(hotspot_nonexp, prob10 > 0 & prob10 < 1))
+
+fit.nonexp
+```
+
+The estimated average effect of spillover on non-experimental units is 4.602.
+
+## Question 10
+
+### Part A
+
+Firstly, the no-anticipation assumption, which states that the potential outcomes must be unaffected by treatments that are administered in the future, must be satisfied. Substantively, this assumption means that tetris performance should not be caused by the prospect of running or exposure to the preparatory work that goes with it (such as stretching before a run). In my opinion, this assumption is satisfied because neither the student's running in future periods nor the preparatory stretching will play a significant role in her tetris performance.
+
+Secondly, the no-persistence assumption, which requires that potential outcomes in one period are unaffected by treatments administered in prior periods, must be satisfied. Substantively, this assumption means that tetris performance in a given period should not be affected by running in prior periods. In my opinion, this assumption is satisfied because the wash-out period, which is at least 24 hours, is sufficient and; likewise, her prior running should not affect the tetris performance (assuming that she does not run too aggressively and does not cause herself to feel burnt out for the next day).
+
+However, this study has a serious flaw in regard to the excludability assumption. This is because she is the subject herself and also the research assistant who does the data collection and knows the hypothesis. Therefore, the excludability assumption is at severe risk.
+
+
+```{r}
+library(ri)         # load the RI package
+set.seed(1234567)   # random number seed, so that results are reproducible
+
+# Set your working directory
+# setwd()
+
+# Data are from Hough, Leslie. 2010. 
+# âExperimenting with an N of 1.â Yale University Working Paper.
+
+hough <- read.csv("Problem 8.10 Hough.csv", stringsAsFactors = FALSE)
+
+Y <- hough$tetris
+Z <- hough$run
+N <- length(Z)
+
+# exclude day 1 from analysis
+Zlag <- c(NA,Z[2:N-1])
+Ylag <- c(NA,Y[2:N-1])
+
+# simple random assignment based on coin flips
+randfun <- function() rbinom(N,1,.5)    
+numiter <- 10000
+set.seed(343)
+# random assignment follows the custom function "randfun"
+perms <- genperms.custom(numiter=numiter,randfun=randfun)  
+
+## note on missing data: the default for LM is NA.omit=TRUE
+## This default eliminates the first lag, and the two days with missing outcomes
+
+### This code performs the estimation for parts b, c, and d
+
+fit1 <- lm(Y~Z)$coefficients["Z"]             # regress Y on current Z
+fit2 <- summary(lm(Y~Z+Zlag))$fstatistic[1]   # regress Y on current and lagged Z
+fit3 <- lm(Ylag~Z)$coefficients["Z"]          # placebo fit: regress lagged Y on Z
+fit4 <- lm(hough$energy~Z)$coefficients["Z"]  # consider current Z's effects on energy
+fit5 <- lm(hough$gre~Z)$coefficients["Z"]     # consider current Z's effects on GRE
+
+# initialize the five vectors of results
+dist1 <- dist2 <- dist3 <- dist4 <- dist5 <- rep(NA,numiter)
+
+for (i in 1:numiter) {
+  Zri <- perms[,i]
+  Zlagri <- c(NA,Zri[2:N-1]) # exclude day 1 from analysis
+  
+  dist1[i] <- lm(Y~Zri)$coefficients["Zri"]
+  dist2[i] <- summary(lm(Y~Zri+Zlagri))$fstatistic[1]
+  dist3[i] <- lm(Ylag~Zri)$coefficients["Zri"]
+  dist4[i] <- lm(hough$energy~Zri)$coefficients["Zri"]
+  dist5[i] <- lm(hough$gre~Zri)$coefficients["Zri"]
+}
+
+mean(dist1 >= fit1)      # one-tailed p-value: does running increase Tetris scores
+mean(dist2 >= fit2)      # one-tailed p-value: does running increase Tetris scores
+mean(abs(dist3) >= abs(fit3))  # two-tailed p-value: placebo fit
+mean(abs(dist4) >= abs(fit4))      # one-tailed p-value: does running improve energy
+mean(abs(dist5) >= abs(fit5))      # one-tailed p-value: does running improve GRE
+
+```
+
+### Part B
+
+```{r}
+fit1
+fit2
+```
+
+
+The estimated immediate effect of running on Tetris score is 13613.1. This means that running resulted in an increase of 13613.1 points in Tetris as compared to walking.
+
+Furthermore, the number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 68, corresponding to a p-value of 0.0068, for the one-tailed test. We are using the one-tailed test because we are interested in seeing if the ATE corresponds to an increase in the Tetris performance.
+
+Our sharp null hypothesis was that that ATE is equal to 0 for all i. The alternative hypothesis is that ATE is greater than 0 for all i. Given that, our p-value is much lower than 0.05, we  have enough evidence to reject the null hypothesis. We conclude that the estimated ATE is greater than zero for all of our observations.
+
+```{r}
+fit2
+```
+
+The estimated lagged effect of running on Tetris score on the preceding day is 4.544592. This means that running resulted in an increase of 4.544592 points in Tetris as compared to walking.
+
+Furthermore, the number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 190, corresponding to a p-value of 0.019, for the one-tailed test. We are using the one-tailed test because we are interested in seeing if the ATE corresponds to an increase in the Tetris performance.
+
+Our sharp null hypothesis was that that ATE is equal to 0 for all i. The alternative hypothesis is that ATE is greater than 0 for all i. Given that, our p-value is much lower than 0.05, we  have enough evidence to reject the null hypothesis. We conclude that the estimated lagged ATE is greater than zero for all of our observations.
+
+
+### Part C
+
+```{r}
+fit3
+```
+
+The estimated effect of running on Tetris score on the preceding day is 645.6212. This means that running resulted in an increase of 645.6212 points in Tetris on the preceding day as compared to walking.
+
+Furthermore, the number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 8994, corresponding to a p-value of 0.8994, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the ATE caused any effect (regardless of the direction of the effect).
+
+Our sharp null hypothesis was that that ATE is equal to 0 for all i. The alternative hypothesis is that ATE is not equal to 0 for all i. Given that, our p-value is much higher than 0.05, we do not have enough evidence to reject the null hypothesis. We conclude that the estimated ATE is zero for all of our observations. Thus, randomization confirms the prediction that the true effect is zero.
+
+### Part D
+
+```{r}
+fit4
+fit5
+```
+
+The estimated effect of running on Tetris score while holding energy constant is 0.07142857. This means that running resulted in an increase of 0.07142857 points in Tetris as compared to walking.
+
+Furthermore, the number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 9168, corresponding to a p-value of 0.9168, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the ATE caused any effect (regardless of the direction of the effect).
+
+Our sharp null hypothesis was that that ATE is equal to 0 for all i. The alternative hypothesis is that ATE is not equal to 0 for all i. Given that, our p-value is much higher than 0.05, we do not have enough evidence to reject the null hypothesis. We conclude that the estimated ATE is zero for all of our observations.
+
+The estimated effect of running on Tetris score while holding gre score constant is -0.1753247. This means that running resulted in a decrease of 0.1753247 points in Tetris as compared to walking.
+
+Furthermore, the number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 3807, corresponding to a p-value of 0.3807, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the ATE caused any effect (regardless of the direction of the effect).
+
+Our sharp null hypothesis was that that ATE is equal to 0 for all i. The alternative hypothesis is that ATE is not equal to 0 for all i. Given that, our p-value is much higher than 0.05, we do not have enough evidence to reject the null hypothesis. We conclude that the estimated ATE is zero for all of our observations. Thus, randomization confirms the prediction that the true effect is zero.
+
+
+## Question 11
+
+### Part A
+
+```{r}
+#### Problem 8.11a ####
+
+# Recreate dataset
+week <- c(rep("2", 8), rep("3", 8))
+prob00 <- c(rep(0.5, 8), rep(0.25, 8))
+prob01 <- c(rep(0.25, 8), rep(0.25, 8))
+prob11 <- c(rep(0.25, 8), rep(0.50, 8))
+Y <- c(9,5,2,3,3,8,3,1,
+       4,7,10,10,3,10,4,3)
+Z <- c("11", "00", "01", "00", "00", "11", "00", "01",
+       "11", "01", "11", "01", "00", "11", "00", "11")
+
+# Estimate E[Y_{01}-Y_{00}]
+mean01 <- weighted.mean(Y[Z=="01"], w=1/prob01[Z=="01"])
+mean00 <- weighted.mean(Y[Z=="00"], w=1/prob00[Z=="00"])
+ate01_00 <- mean01 - mean00
+ate01_00
+```
+The estimated E[Y01-Y00] when restricting attention to weeks 2 and 3 is 1.5. In the text, the estimated E[Y11-Y00] is computed as 4.13, which is more than twice of what we estimated E[Y01-Y00] to be.
+
+
+### Part B
+
+```{r}
+# Estimate E[Y_{11}-Y_{00}]
+mean11 <- weighted.mean(Y[Z=="11" & week=="2"], w=1/prob11[Z=="01" & week=="2"])
+mean00 <- weighted.mean(Y[Z=="00" & week=="2"], w=1/prob00[Z=="00" & week=="2"])
+ate11_00 <- mean11 - mean00
+ate11_00
+```
+The estimated E[Y11-Y00] without imposing the assumption that treatment effects disappears after two weeks is 5. 
+
+

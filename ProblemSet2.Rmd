@@ -1,0 +1,296 @@
+---
+title: "Problem Set 2"
+author: "Kerem Tuncer"
+date: "09/24/2021"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+```{r}
+rm(list = ls())
+```
+
+
+## Question 1
+
+(a) The notation Yi(0) denotes the potential outcome if the ith subject were not treated.
+
+(b) The notation Yi(0)|Di = 1 refers to the untreated potential outcome for the ith subject who would be treated under some hypothetical allocation of treatments. On the other hand, the notation Yi(0)|di = 1 refers to the untreated potential outcome for the ith subject who actually receives the outcome. In both notations, we are looking at the ith subject's untreated potential outcomes; however, in the first notation, the untreated potential outcome assumes a hypothetical treatment allocation, where subject i would be treated. In the second notation, we are referring to the untreated potential outcome when treatment was in fact delivered to subject i. All in all, the first notation refers to the untreated potential outcome of subject i from a hypothetical untreated subset, whereas the second notation refers to the untreated potential outcome of subject i from a subset that has actually received the treatment.
+
+(c) The notation Yi(0) denotes the potential outcome if the ith subject were not treated, whereas the notation Yi(0)|Di = 0 refers to the untreated potential outcome of subject i who would not be treated under some hypothetical allocation of treatments. In regards to Yi(0), we are referring to the untreated potential outcome of a subject i that is chosen from the entire set of subjects. However, in the second notation, we refer to the untreated potential outcome of a subject i that is chosen from the subset of subjects that were untreated in a hypothetical allocation of treatments.
+
+(d) The notation Yi(0)|Di = 0 refers to the untreated potential outcome of subject i who would not be treated under some hypothetical allocation of treatments, whereas Yi(0)|Di = 1 refers to the untreated potential outcome of subject i who would be treated under some hypothetical allocation of treatments. In regards to Yi(0)|Di = 0, we are referring to the untreated potential outcome of a subject i that is chosen from the subset of subjects that were untreated in a hypothetical allocation of treatments. However, in Yi(0)|Di = 1, we refer to the untreated potential outcome of a subject i that is chosen from the subset of subjects that were treated in a hypothetical allocation of treatments. So the primary difference in these notations is whether the untreated potential outcome comes from a subject that received a treatment or did not receive a treatment in a hypothetical treatment allocation.
+
+(e) The notation E[Yi(0)] refers to the the expected value of the untreated potential outcome of subject i, who was sampled at random. On the other hand, the notation E[Yi(0)|Di = 1] refers to the expected value of the untreated potential outcome of a subject i, who was selected at random from subjects that would have been treated under a hypothetical treatment allocation. Hence, the primary difference between these notations is that the first one refers to the expectation of Yi(0) from a random subject coming from the entire set, whereas the second one refers to the expectation of Yi(0) from a random subject coming from a subset of subjects who would have been treated in a hypothetical allocation of treatments.
+
+(f) First, let's go over what each expression means in the selection bias term. The notation E[Yi(0)|Di = 1] refers to  to the expected value of the untreated potential outcome of a subject i, who was selected at random from subjects that would have been treated under a hypothetical treatment allocation. On the other hand, the notation E[Yi(0)|Di = 0] to the expected value of the untreated potential outcome of a subject i, who was selected at random from subjects that would have been untreated under a hypothetical treatment allocation.
+
+Under random assignment of Di, we should end up with two groups of observations that are, in expectation, identical prior to application of the treatment. So, with randomization, Di will not convey any information whatsoever about the potential values of Yi(1) or Yi(0).
+
+Therefore, we would assume that the expected value of the untreated potential outcome be identical for observations that would receive a treatment and observations that would not receive a treatment under a hypothetical treatment allocation. Given that these expectations are identical, their difference would be 0.
+
+## Question 2
+
+```{r}
+Y0 <- c(10, 15, 20, 20, 10, 15, 15)
+Y1 <- c(15, 15, 30, 15, 20, 15, 30)
+
+diffY0_Y1 <- Y0-Y1
+
+exp.Y0 <- mean(Y0)
+exp.Y1 <- mean(Y1)
+
+exp.Y0 - exp.Y1
+mean(diffY0_Y1)
+
+exp.Y0 - exp.Y1 == mean(diffY0_Y1)
+```
+
+## Question 3
+
+A
+
+```{r}
+table <- c(1,1,0,2,0,1,1,0,1)
+table <- matrix(table,nrow=3,ncol=3,byrow=TRUE)
+table
+```
+
+
+B
+
+```{r}
+prop.table <- table / sum(table)
+prop.table
+```
+
+C
+
+```{r}
+Y1_15 <- sum(prop.table[,1])
+Y1_20 <- sum(prop.table[,2])
+Y1_30 <- sum(prop.table[,3])
+Y1_marginal <- c(Y1_15, Y1_20, Y1_30)
+prop.table <- rbind(prop.table, Y1_marginal)
+prop.table
+```
+
+D
+
+```{r}
+Y0_10 <- sum(prop.table[1,])
+Y0_15 <- sum(prop.table[2,])
+Y0_20 <- sum(prop.table[3,])
+Y0_marginal <- c(Y0_10, Y0_15, Y0_20, 1)
+prop.table <- cbind(prop.table, Y0_marginal)
+prop.table
+```
+
+E
+
+```{r}
+exp.Y0.given.Y1.over.15 <- (10 + 15 + 20) / 3
+exp.Y0.given.Y1.over.15
+```
+
+F
+
+```{r}
+exp.Y1.given.Y0.over.15 <- (15 + 30) / 2
+exp.Y1.given.Y0.over.15
+```
+## Question 4
+
+Let's first begin by defining the ATT using the equation 2.15.
+
+$$ATT = E[\tau_i |D_i = 1] = E[Y_i(1) - Y_i(0) | D_i = 1]$$
+Now, let's define the ATE assuming random assignment using the equation 2.13.
+
+$$ATE = E[Y_i(1)|D_i = 1] - E[Y_i(0)|D_i = 0]$$
+
+Once again, let's use equation 2.15, to see the relationship between the ATE and the ATT when there is a lack of random assignment.
+
+$$E[Y_i(1)|D_i = 1] - E[Y_i(0)|D_i = 0] = E[Y_i(1) - Y_i(0) | D_i = 1] + E[Y_i(0)|D_i = 1] - E[Y_i(0)|D_i=0] $$
+However, Equation 2.12 tells us that, under random assignment, subjects that do not receive the treatment (Di = 0) have the same expected untreated potential outcome Y(0) that the treatment group (Di = 1) would have if it were untreated.
+
+$$E[Y_i(0)|D_i = 1] = E[Y_i(0)|D_i=0]$$
+
+As a result, the selection bias term in equation 2.15 will be equal to 0.
+
+$$E[Y_i(0)|D_i = 1] - E[Y_i(0)|D_i=0] = 0$$
+
+Now, let's plug in the zero to the selection bias term of 2.15 because we are assuming random assignment.
+
+$$E[Y_i(1)|D_i = 1] - E[Y_i(0)|D_i = 0] = E[Y_i(1) - Y_i(0) | D_i = 1] + 0$$
+Finally, we are left with the following equation.
+
+$$E[Y_i(1)|D_i = 1] - E[Y_i(0)|D_i = 0] = E[Y_i(1) - Y_i(0) | D_i = 1]$$
+
+
+Therefore, under random assignment, we can say that:
+
+
+$$ATE = ATT$$
+## Question 5
+
+(a) The first method is an example of a simple random assignment procedure, where each of the six subjects will have an identical probability m/6 of being allocated to the treatment group (where m stands the number of subjects who are assigned to the treatment
+group). With this method, we don't know how many subjects will end up in the treatment group beforehand. For example, if 5 of the 6 coin flips are tails, then we will have 5 subjects in the 60-minute group and only one in the 30-minute group. Hence, the primary disadvantage of simple random assignment is that when N is small, random chance can create a treatment group that is larger or smaller than what the researcher intended. Given that the N is small in this exercise, a mismatch in the size of the experimental conditions is a strong possibility. The primary advantage of this method is that it is usually simpler to execute than complete random assignment methods. Additionally, this method works perfectly fine without knowing the number of subjects beforehand.
+
+The second method is an example of a complete random assignment procedure, where exactly m units to treatment are assigned. In our case, m is equal to 3. There will end up being exactly 3 subjects in the 30-minute group and 3 subjects in the 60-minute group. The primary advantage of this method is that the researcher will know the exact numbers of the treated and the untreated beforehand. Additionally, the standard errors associated with complete random assignment are generally smaller, increasing experimental power (according to the randomizr package vignette). However, there is a potential issue with this method. If the researcher has malicious intentions, he/she could easily view which card has what value and can easily change the order after the shuffling process has taken place. Therefore, this method is lacking the necessary procedural safeguards that would have made it more difficult for researchers to view (and possibly change) the ordering. Additionally, a rather trivial disadvantage of this method is that is usually more complex to execute than simple random assignment. Surely, a coin flip would have been quicker.
+
+The third method is also an example of a complete random assignment procedure, where exactly m units to treatment are assigned. In our case, m is equal to 3. There will end up being exactly 3 subjects in the 30-minute group and 3 subjects in the 60-minute group. Like with the second method, the primary advantage of this method is that the researcher will know the exact numbers of the treated and the untreated beforehand. Additionally, the standard errors associated with complete random assignment are generally smaller, increasing experimental power (according to the randomizr package vignette). On the other hand, this method has a better procedural safeguard that would protect against the researcher viewing (or possibly changing) the treatment assignment. Given that the shuffling takes place after the slips are put into envelopes, a researcher cannot view/access the slips as easily as with the cards. Hence, it would be more difficult for a malicious researcher to alter the assignment process. Additionally, a rather trivial disadvantage of this method is that is usually more complex to execute than simple random assignment. Surely, a coin flip would have been quicker.
+
+(b) A sample size of 6 was small enough to cause a treatment group that is larger or smaller than what the research intended. However, with a sample size of 600, the size of the 30-minute group and the size of the 60-minute group will be closer to each other. We can test this out with a short script.
+
+```{r}
+set.seed(234)
+library(randomizr)
+N <- 6
+Z <- simple_ra(N = N)
+prop.table(table(Z))
+
+N <- 600
+Z <- simple_ra(N = N)
+prop.table(table(Z))
+```
+
+As you can see from the output above, the two experimental conditions are more equally distributed when the sample size is large.
+
+(c) The expected value of Di would be the same for both envelope method and the coin toss method. However, the formula to get to the answer will differ between them.
+
+For the coin toss method, we know that ending up in the 30 minute group has a probability of 1/2 and ending up in the 60 minute group has a probability of 1/2. Therefore, we can do the following calculation.
+
+$$E[D_i] = 30 * (1/2) + 60 * (1/2) = 45 minutes $$
+For the envelope method, we know that 3 out of 6 envelopes contain a 30 and 3 out of 6 envelopes contain a 60. Therefore, we can do the following calculation.
+
+$$E[D_i] = 30 * (3/6) + 60 * (3/6) = 270 / 6 =45 minutes $$
+
+
+## Question 6
+
+This study has used random sampling but did not use random assignment. We should keep in mind that random sampling is a different concept than random assignment. Random selection is how you draw the sample of people for your study from a population. Random assignment is how you assign the sample that you draw to different groups or treatments in your study. Therefore, this is an observational study. For this study to be an experiment, the researcher should have randomly assigned some participants to a control group (no preparatory class) and the others to a treatment group (taking a preparatory class).
+
+## Question 7
+
+(a) An estimator is a statistical procedure used to make guesses about parameters such as the average treatment effect. They generate estimates. An estimator is unbiased if it generates the right answer, on average. In other words, if the experiment were replicated an infinite number of times under identical conditions, the average estimate would equal the true parameter. In conclusion, an unbiased estimator is a statistical procedure that is used to make guesses about parameters, and these guesses equal the true parameter, on average.
+
+(b) This allocation procedure - which is random assignment - will not produce upwardly biased estimates, on average. The term "on average" is the key here. It is true that the estimate might be upwardly biased when villages 3 and 7 randomly ended up in the treatment group. However, if we were to redo the experiment an infinite times using the same allocation procedure, then the average of the estimates would be equal to the true parameter. Under random assignment, other villages with lower treated potential outcomes can also end up being the two villages that get the treatment. Hence, this allocation procedure of random assignment should be able to get unbiased estimates, on average.
+
+(c) When treatments are administered using a procedure that does not give every subject the same probability of being treated, potential outcomes are not independent of the treatments that subjects receive. As a result, the procedure of assigning treatment by convenience will result in biased estimates, on average. With this procedure, we will generally end up with a treatment group that has higher potential outcomes than the rest of the sample because these observations are systematically different than the rest.
+
+## Question 8
+
+A
+
+```{r}
+n_control <- 21
+n_ngo <- 18
+n_rtia <- 23
+n_bribe <- 24
+
+verified_control <- 20
+verified_ngo <- 18
+verified_rtia <- 23
+verified_bribe <- 24
+
+(verified_ngo / n_ngo) - (verified_control / n_control)
+(verified_rtia / n_rtia) - (verified_control / n_control)
+(verified_bribe / n_bribe) - (verified_control / n_control)
+
+verified_control / n_control
+```
+
+Given that 100% of the subjects in the treatment groups got their residence verified, the estimated average treatment effect for these 3 treatments were the same, which was 4.8 percentage points. 100 percent of the subjects in each treatment group got their residence verified, whereas 95.2% of the subjects in the control group got their residence verified. Therefore, the treatments increased residence verification rate by 4.8 percentage points as compared to the control group.
+
+```{r}
+days.control <- 37
+days.ngo <- 37
+days.rtia <- 37
+days.bribe <- 17
+
+days.ngo - days.control
+days.rtia - days.control
+days.bribe - days.control
+```
+
+The estimated average treatment effect for the NGO and the RTIA treatments were 0 for the speed of residence verification. The median number of days to residence verification were the same in the control, in the RTIA group, and the NGO group. Therefore, these treatments did not have an effect on the verification speed.
+
+On the other hand, the estimated average treatment effect for the bribe treatment was -20. This means that the bribe treatment decreased the wait time for residence verification by 20 days. This is a rather large effect.
+
+
+B
+
+```{r}
+card_control <- 5
+card_ngo <- 3
+card_rtia <- 20
+card_bribe <- 24
+
+
+(card_ngo / n_ngo) - (card_control / n_control)
+(card_rtia / n_rtia) - (card_control / n_control)
+(card_bribe / n_bribe) - (card_control / n_control)
+```
+
+The estimated average treatment effects for ration cards differed by treatment. For the NGO treatment, the estimated average treatment effect was -7.1 percentage points. Therefore, the NGO treatment decreased ration card receival rate by 7.1 percentage points as compared to the control group. For the RTIA treatment, the estimated average treatment effect was 63.1 percentage points. Therefore, the RTIA treatment increased ration card receival rate by 63.1 percentage points as compared to the control group. For the bribe treatment, the estimated average treatment effect was 76.2 percentage points. Therefore, the RTIA treatment increased ration card receival rate by 76.2 percentage points as compared to the control group.
+
+C
+
+These results suggest that the RITA is an effective way of helping slum dwellers obtain ration cards. Even though it is necessary to take a look at the standard errors and the confidence intervals, an estimated average treatment effect of 76.2 percentage points is a very large difference in the rate of receiving ration cards. However, our results also suggest that the estimated ATE of the RTIA treatment is less than that of the bribe treatment. Hence, it seems that bribes are still more effective in receiving ration cards than the RTIA.
+
+## Question 9
+
+(a) I would like to begin by saying that the question does not mention whether "winning nothing" implies that they have played the lottery and won nothing. Technically speaking, you can "win nothing" because you did not play the lottery. Therefore, I will assume that the control group also consists of individuals who have not played the lottery.
+
+The potential outcomes of those who report winning more than $10,000 identical, in expectation, to those who report
+winning little or nothing are clearly different for several reasons. Firstly, ending up in the control group can be a result of not having played the lottery. The background characteristics (such as socioeconomic status) of those who play the lottery and those who do not play the lottery will definitely be different. Secondly, ending up in the treatment group (winning $10000+) could be related to buying more lottery tickets for a single lottery or buying tickets for many different lotteries. Once again, the background characteristics of those who have played more lotteries (or bought more tickets) will be different than those who have played less (or never). As a result, it is highly unlikely that this researcher's treatment allocation procedure will result in analogous potential outcomes between the two experimental conditions.
+
+(b) Restricting the sample to those who had played the lottery at least once during the past year makes it so that those who have never played the lottery are excluded. Therefore, the potential outcomes between the new treatment group and the new control group are probably closer to each other. However, the other two points I have made above - regarding the amount of tickets bought or the amount of lotteries played - still stand. Once again, winning large amounts of money in the lottery can be due to playing many lotteries or investing larger amounts of money in buying many tickets. For example, who are richer are able to buy more tickets (or participate in more lotteries). The wealthy people's views on the estate tax will be different than those of the poorer. As a result, there are still many possible confounding variables that would make the potential outcomes different between the two groups.
+
+## Question 10
+
+(a) In this scenario, the excludability assumption will be violated. Here, the disclosure of the study's purpose to the treatment group is correlated with treatment assignment. 
+
+However, the researchers were initially trying to assess the specific effect of receiving a free newspaper subscription
+on students' interest in politics.
+
+But now, the disclosure of the study's purpose to those in the treatment group makes it so that now the researcher is assessing a combination of the effect of receiving free newspapers and the effect of learning about the study's purpose on students' interest in politics. If the researcher had defined the effect of a free newspaper subscription to include the disclosure of the study's purpose, then there would not have been any threat to the exclusion restriction. Yet, according to the question text, that is not what the researcher had in mind. In conclusion, the expected outcome of the experiment will no longer reveal the causal effect that the researcher had initially planned to estimate.
+
+Now, let's take a look at this scenario with the equations provided in the textbook. We know that z denotes whether an observation has been allocated to treatment or control, whereas d denotes where an observation has received the treatment or not. Then, we should define $Y_i(z,d)$ to be the potential outcome when $z_i = z$ and $d_i = d$.
+
+The exclusion restriction assumption says the following:
+$$Y_i(1,d) = Y_i(0,d)$$
+The above equation means that the potential outcomes must only respond to the input from $d_i$ - whether a treatment was administered or not. Therefore, the potential outcomes should not respond to whether an observation was merely assigned to the treatment or the control group. However, in this study, students who are assigned to the treatment group learn about the study's purpose without even starting to receive the treatment. As a result, z has an unintended effect on the potential outcome of the treatment group observations. We get the following inequality:
+
+$$Y_i(1,d) \neq Y_i(0,d)$$
+
+
+(b) The non-interference assumption will be violated in this scenario. If the newspapers end up in areas where anyone can access and read them, then both the subjects in the treatment group and in the control group will be able to read them for free. As a result, the treatment of a subject who leaves his/her newspaper in the cafeteria will affect the potential outcomes of other subjects. This means that the estimate of the ATE for this study will be prone to bias.
+
+Let's revisit this scenario by using notations. In a study that has measures against interference, we use the notation $Y_i(d)$ to refer to potential outcomes (where d stands for the treatment administered specifically to subject i). However, there is also the notation $Y_i(\textbf{d})$, to refer to potential outcomes (where $\textbf{d}$ describes all of the treatments administered to all subjects). When the non-interference assumption is not violated, we can reduce $Y_i(\textbf{d})$ to $Y_i(d)$. However, in this scenario with newspapers ending up in the cafeteria, it would be erroneous to reduce $Y_i(\textbf{d})$ to $Y_i(d)$.
+
+## Question 11
+
+(a) Yes, this measurement approach would maintain symmetry between the treatment and the control groups. If the two groups were compared within 3 years of the treatment assignment, then the subjects in the treatment group would have driven a car for longer than those in the control group. As the question says, driving for longer could result in being exposed to more traffic accidents. Hence, the amount driven would have been correlated with treatment assignment, which would have violated the excludability assumption. However, comparing the two groups with 3 years of obtaining a driver's license makes it so that both groups will end up driving a relatively similar amount.
+
+Likewise, measuring the total number of accidents would also maintain symmetry between the treatment and control groups. Given that this is a randomized study, we would not expect the individuals in the treatment group to drive longer distances than individuals in the control group. Therefore, comparing the number of accidents should still be valid in regards to maintaining symmetry, as long as the same definition of accidents/moving violations are used in both groups.
+
+(b) Yes, the symmetry will be maintained even if the outcome measure were the number of accidents per mile of driving. We would not expect the individuals in the treatment group to drive longer distances or be more prone to accidents than individuals in the control group. Therefore, comparing the number of accidents per miles driven should still be valid in regards to maintaining symmetry, as long as the same definition of accidents/moving violations are used in both groups.
+
+(c) No, this measurement approach would not maintain symmetry between the treatment and the control groups. If the two groups were compared within 3 years of the treatment assignment, then the subjects in the treatment group would have driven a car for longer than those in the control group. As the question says, driving for longer could result in being exposed to more traffic accidents. Hence, the amount driven would have been correlated with treatment assignment, which would have violated the excludability assumption. As a result, the new treatment effect will also include the effect of driving for a longer amount of time in addition to the effect of the driver's training program.
+
+## Question 12
+
+(a) Let's begin by discussing what these notations means. In short, they mean that the potential treated and the untreated outcomes between a hypothetical treatment group and a hypothetical control group would be the same. Without random assignment, I would be hesitant to assume that these potential outcomes are the same because those who read more than 3 hours a day would have different background characteristics than those who read less than three hours a day or don't read at all. Firstly, those who read more than 3 hours a day will have less time hanging out with other inmates. Logically, less time hanging out with others will lead to less encounters. Secondly, in my opinion, those who read more are probably more educated than the rest. Hence, they would be better aware of the consequences of violent encounters compared to other inmates. These differences between the characteristics of the inmates between the two groups is a clear indication why the potential outcomes would not equal each other and that is why random assignment is necessary.
+
+(b) The excludability assumption will be strongly threatened in this scenario. Those in the treatment group will be in a private carrel for 3 hours a day where there are no other inmates. In contrast, the individuals in the control group will not be in area as secluded as a private carrel. Hence, the control group participants will have more exposure to inmates, which could result in more violent encounters. Here, being in a private carrel is correlated with treatment assignment. As a result, the new treatment effect will also include the effect of being secluded from other inmates in addition to the effect of the 3 hours of reading.
+
+(c) The non-interference assumption states that a subject’s potential outcomes reflect only whether they receive the treatment themselves. However, there is a clear threat to non-interference in this study because the participants in the treatment group will end up spending time and communicating with the individuals in the control group (because every prisoner except the 10 individuals are technically in the control group). Hence, the behavioral changes in the treatment group subjects might have an influence in the behavior of the control group subjects. For example, let's assume a scenario where a treatment group inmate might is together with control group inmates when a violent encounter with the prison staff is about to start. Then, the treated inmate might de-escalate the situation, which would also cause control group inmates to not experience that violent encounter. Likewise, another possible scenario caused by communication between the participants could be that some control group participants start reading for 3+ hours a day in their own rooms because a treatment group inmate recommended a book. All in all, the fact that the control group and treatment group participants live together threatens the non-interference assumption.
+
+
+(d) The above-mentioned threats to the non-interference assumption makes it so that the estimated average treatment effect of the 3+ hour reading treatment is biased. This is because all three core assumptions have to be met to a certain degree in order to get unbiased estimates. In this study, the non-interference assumption will cause the researchers to overestimate the magnitude of the treatment's effect. A study with a better experimental design should be necessary before implementing such a policy.
+
+
+
+

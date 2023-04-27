@@ -1,0 +1,606 @@
+---
+title: "Problem Set 5"
+author: "Kerem Tuncer"
+date: "11/01/2021"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+## Question 1
+
+### Part A
+
+```{r}
+395 / (395 + 1050)
+```
+There were 395 people in the treatment group who were contacted. However, there were a total of 1445 people who were assigned to the treatment group. Therefore, $E[d_i(1)]$ is 0.273.
+
+The expression $E[Y_i(0)|d_i(1) = 0]$ is the untreated potential outcome among those who were assigned to the treatment group but not contacted. This is equal to 36.48% according to the table.
+
+The expression $E[Y_i(0)|d_i(1) = 1]$ is the average turnout of untreated people who would have received the canvassers if put in the treatment group.
+
+```{r}
+control.mean <- 37.54
+share.never <- 1 - (395 / (395 + 1050))
+mean.never <- 36.48
+share.compliers <- (395 / (395 + 1050))
+
+(control.mean - (share.never*mean.never)) / share.compliers
+```
+$E[Y_i(0)|d_i(1) = 1]$ is equal to 40.36%.
+
+The expression $E[Y_i(1)|d_i(1) = 1]$ is the turnout of those who received the treatment and were assigned to the treatment group and it is equal to 54.43%.
+
+### Part B
+
+## Question 2
+
+```{r}
+observation <- 1:6
+d_z0 <- rep(0,6)
+d_z1 <- c(1, 1, 1, 0, 0, 0)
+type <- c(rep("Complier", 3), rep("Never-Taker", 3))
+Y_d0 <- c(1, 0, 1, 0, 1, 0)
+Y_d1 <- c(0, 0, 0, 5, 6, 4)
+
+schedule <- as.data.frame(cbind(observation, Y_d0, Y_d1, d_z0, d_z1, type))
+schedule
+```
+
+```{r}
+mean(as.numeric(schedule$Y_d1)) - mean(as.numeric(schedule$Y_d0))
+```
+ATE is 2, which is positive.
+
+```{r}
+compliers <- subset(schedule, type == "Complier")
+mean(as.numeric(compliers$Y_d1)) - mean(as.numeric(compliers$Y_d0))
+```
+The CACE is -2/3 which is negative.
+
+
+The CACE would be misleading if it was regarded as the ATE when publishing the results of this experimental design. However, the CACE would be informative if we are interested in estimating the treatment effect specifically among the compliers. For example, we might be interested  to know the outcome from observations whom the treatment administration effort will likely reach (like in electoral campaigns).
+
+## Question 3
+
+### Part A
+
+In one-sided non-compliance, it is impossible to have a negative $ITT_D$. Let's take a look at why:
+
+$$ITT_D = E[d_i(1)] - E[d_i(0)]$$
+In one-sided non-compliance, we assume that $E[d_i(0)] = 0$. So, $ITT_D$ cannot be negative. It also cannot be 0, or the equation will be undefined.
+
+
+Therefore, if the ITT is negative, then the CACE also has to be negative. This is because of the following equation:
+
+$$CACE = ITT / ITT_D$$
+
+If the numerator is negative, but the denominator is positive, then the whole result will be negative, as well. Therefore, this statement is TRUE.
+
+### Part B
+
+We already established that $ITT_D$ cannot be negative in one-sided non-compliance. Now, given that $ITT_D$ is in the denominator of $CACE = ITT / ITT_D$, the larger it becomes, the smaller the CACE will be. Likewise, the smaller the $ITT_D$, the larger the $CACE$. Therefore, this statement is TRUE, as well. 
+
+### Part C
+
+If no one receives the treatment, our $ITT_D$ will have to equal 0. Given that $ITT_D$ is in the denominator of the CACE equation, the CACE will be undefined, so we will not be able to identify the CACE. Therefore, this statement is TRUE. 
+
+## Question 4
+
+### Part A
+
+Let's write this equality down.
+
+$$E[Y_i(z = 1)] = E[Y_i(z = 1) | d_i(1) = 1]$$
+In this equation, $d_i$ is a condition. Therefore, this equality implies that $E[Y_i(z = 1)]$ will be the same no matter what $d_i$ is equal to. However, this not in agreement with the non-excludability assumption. The non-excludability assumption states that $Y_i(z,d) = Y_(d)$. So, according to the non-excludability assumption, the value of z should not matter. But, in this case, the value of $d_i$ does not matter. In conclusion, this equality is not a consequence of the excludability assumption.
+
+### Part B
+
+Let's write this equality down.
+
+$$E[Y_i(z = 0, d = 0) | d_i(1) = 0] = E[Y_i(z = 1, d = 0) | d_i(1) = 0]$$
+The only difference between the left and the right side of the equality is the value of z. On the left side, z is equal to 0 and it is equal to 1 on the right side. The non-excludability assumption states that the value of z should not matter. So, the untreated potential outcomes should be the same regardless of the assignment. Fortunately, this is the case in our equality. We can even further justify it by getting rid of the z term in both sides of the equality.
+
+$$E[Y_i(d = 0) | d_i(1) = 0] = E[Y_i(d = 0) | d_i(1) = 0]$$
+
+In conclusion, this equality is a consequence of the excludability assumption.
+
+### Part C
+
+Let's write this equality down.
+
+$$E[Y_i(z = 1, d(1))] = E[Y_i(z = 1, d(0))]$$
+
+For this equality, it is important to mention that we are not told about whether the subjects received the treatment or the control. This is because we do not know what d(0) or d(1) are equal to. So, $d = 1$ is not the same thing as $d(1)$.
+
+Another thing to keep in mind is that, with one-sided non-compliance, $d(1)$ can equal either 1 or 0 depending on whether the subject is a complier or a never-taker.  However, we assume that $d(0)$ will be equal to 0.
+
+If $d(1) = 0$, then it would be equal to $d(0)$. But, if $d(1) = 1$, then it will not be qual to $d(0)$. Once again, the value of z does not matter under the excludability assumption but the value of d does matter. Therefore, with the above equality, the inequality below is possible.
+
+$$E[Y_i(z = 1, d(1) = 1)] = E[Y_i(z = 1, d(0) = 0)]$$
+This inequality implies that $E[Y_i(z = 1)]$ will be the same no matter what $d_i$ is equal to. However, this not in agreement with the non-excludability assumption. The non-excludability assumption states that $Y_i(z,d) = Y_(d)$. So, according to the non-excludability assumption, the value of z should not matter. But, in this case, the value of $d_i$ does not matter. In conclusion, this equality is not a consequence of the excludability assumption.
+
+### Part D
+
+Let's write this equality down.
+
+$$E[Y_i(z = 0, d(0))] = E[Y_i(z = 1, d(0))]$$
+
+With one-sided non-compliance, we assume that $d(0) = 0$. Therefore, the equality can also be written as the following;
+
+$$E[Y_i(z = 0, d(0) = 0)] = E[Y_i(z = 1, d(0) = 0)]$$
+The only difference between the left and the right side of the equality is the value of z. On the left side, z is equal to 0 and it is equal to 1 on the right side. The non-excludability assumption states that the value of z should not matter. So, the untreated potential outcomes should be the same regardless of the assignment. Fortunately, this is the case in our equality. We can even further justify it by getting rid of the z term in both sides of the equality.
+
+$$E[Y_i(d(0) = 0)] = E[Y_i(d(0) = 0)]$$
+In conclusion, this equality is a consequence of the excludability assumption.
+
+## Question 5
+
+Let's first begin by defining who our compliers and never-takers are. Under one-sided non-compliance, the compliers will be those who receive the treatment and were assigned to the treatment group. The never-takers will be those who did not receive the treatment no matter what experimental condition they were assigned to.
+
+Assuming one-sided non-compliance, we will always be able to know that all of our subjects in the control group were compliers. For all subjects, the value of Yi observed when a subject is assigned to the control group is $Y_i(d(0) = 0)$. Therefore, we will automatically know that all of our control group subjects were compliers.
+
+On the other hand, figuring out who is a complier / never-taker in the treatment group will be trickier and it will depend on the specific experiment design. For example, let's imagine a survey experiment on Qualtrics, where the treatment is watching a 1-minute video. To make sure that treatment subjects watch the video, the researcher makes it so that subjects cannot skip the video; however, the researcher forgets to put an "attention check" question to identify whether a subject really watched the video or not. In most survey experiments, there will be numerous subjects who will let the video play for a minute without watching it. Hence, these subjects will end up not receiving the treatment. Unfortunately, the researcher will not be able to tell who really watched the video (complier) and who did not watch it (never-taker).
+
+We can also come up with an experiment design where the researcher can tell whether a treatment group subject is a complier or a never-taker. Let's assume that a field experiment was conducted that attempted to measure the effect of door-to-door canvassing on voter turnout in local elections. The researchers assign 100 households in that neighborhood to the treatment group and tell canvassers to go to those houses. If the house owner is at home and talks to the canvasser, then the house owner becomes a complier. However, if the house owner is not at home during the canvassing period, then the canvassers can note it down that they were unable to talk to that house owner. These individuals become the never-takers. Hence, the researcher is able to tell whether a treatment subject is a complier or a never-taker.
+
+In conclusion, it is possible to come up with a good experiment design that would allow researchers to know which of their subjects are Compliers and which of their subjects are Never-Takers. Therefore, the statement is clearly false.
+
+## Question 6
+
+### Part A
+
+```{r}
+n.treatment <- 1000
+n.contacted <- 500
+
+ITT_D <- n.contacted / n.treatment
+
+treatment.turnout <- 400 / n.treatment * 100
+control.turnout <- 700 / 2000 * 100
+
+ITT <- treatment.turnout - control.turnout
+
+CACE <- ITT / ITT_D
+
+CACE
+```
+The CACE is 10 percentage points.
+
+### Part B
+
+
+```{r}
+n.treatment <- 1000
+n.contacted <- 250
+
+ITT_D <- n.contacted / n.treatment
+
+treatment.turnout <- 400 / n.treatment * 100
+control.turnout <- 700 / 2000 * 100
+
+ITT <- treatment.turnout - control.turnout
+
+CACE <- ITT / ITT_D
+
+CACE
+```
+
+The CACE is 20 percentage points.
+
+### Part C
+
+The canvassers' exaggerated reports make their efforts seem less effective in terms of the CACE. Let's define higher effectiveness as a higher CACE. When the canvassers said that they contacted more people than they actually did, the CACE was 10 percentage points. However, with the real number of people contacted, the CACE stands at 20 percentage points. Therefore, the canvassers' exaggeration decreased the CACE by 10 percentage points, which means that they made their efforts seem less effective. This phenomenon is due to the fact that their exaggeration increased the $ITT_D$, which is in the denominator of the CACE equation. Therefore, the increase in $ITT_D$ decreased the CACE.
+
+## Question 7
+
+```{r}
+observation <- 1:9
+type <- c(rep("Complier", 6), rep("Never-Taker", 3))
+d_z0 <- rep(0, 9)
+d_z1 <- c(rep(1, 6), rep(0, 3))
+Y_0_z1 <- c(rep(4, 6), rep( 3.5,3))
+Y_0_z0 <- c(rep(4, 6), rep(2.9, 3))
+Y_1 <- c(rep(7, 6), rep(9, 3))
+
+schedule <- as.data.frame(cbind(observation, Y_0_z0, Y_0_z1, Y_1, d_z0, d_z1, type))
+schedule
+```
+
+## Question 8
+
+### Part A
+
+```{r}
+n.treatment <- 1849
+n.control <- 1430
+
+mean.treatment <- 591 / n.treatment * 100
+mean.control <- 377 / n.control * 100
+
+ITT <- mean.treatment - mean.control
+ITT
+```
+
+The estimated ITT is equal to 5.599587 percentage points. Although it is calculated in a similar fashion to the ATE, the ITT is dependent on treatment assignment rather than treatment receival. Therefore, we can say that being assigned to the treatment group increased the recycling rate by 5.599587 percentage points.
+
+### Part B
+
+```{r}
+ITT_D <- 1015 / n.treatment
+ITT_D
+```
+The $ITT_D$ is equal to 0.5489454. Given that there were no compliers in the control group, this value is the proportion of subjects who are treated if assigned to the treatment condition. This means that 54.89454% of the subjects in the treatment group received the treatment (so, they are compliers).
+
+### Part C
+
+The model for the expected recycling rate among those assigned to the control group looks like this;
+
+$$E[Y_i(0)|D_i(1) = 1] * ITT_D + E[Y_i(0)|D_i(1) = 0]*(1-ITT_D)$$
+The model for the expected recycling rate among those assigned to the treatment group looks like this;
+
+$$E[Y_i(1)|D_i(1) = 1] * ITT_D + E[Y_i(0)|D_i(1) = 0]*(1-ITT_D)$$
+
+The formula for CACE looks like this;
+
+$$CACE = E[Y_i(1)|D_i(1) = 1] - E[Y_i(0)|D_i(1) = 1]$$
+We also know that
+
+$$ITT = E[Y_i(1)|D_i(1) = 1] - E[Y_i(0)|D_i(1) = 1] * ITT_D$$
+Therefore,
+
+$$CACE = E[Y_i(1)|D_i(1) = 1] - E[Y_i(0)|D_i(1) = 1] = \frac{ITT}{ITT_D}$$
+
+
+Given that we can compute ITT and $ITT_D$ of the experiment, we can also identify the CACE.
+
+### Part D
+
+```{r}
+ITT / ITT_D
+```
+The estimated CACE is equal to 10.20063. The estimated average treatment effect of the canvassing treatment among Compliers is a 10.20063 percentage point increase in the probability of putting out a recycling bin on at least one occasion during the following three weeks.
+
+### Part E
+
+Comparing the recycling rates of the treated and untreated subjects will produce misleading estimates of the ATE because this comparison will actually be looking at the effect of the treatment assignment instead of the treatment itself.
+
+Likewise, this comparison will produce misleading estimates of the CACE, as well, because this estimator will reveal the CACE plus a term that is the product of the share of Never-Takers in the subject pool times the difference between the average untreated potential outcomes among Compliers and Never-Takers. When there is one-sided non-compliance, this bias term will disappear only if the untreated potential outcomes among Compliers and Never-Takers are the same. However, Compliers and Never-Takers will usually have systematic differences in their characteristics and will also have different average untreated potential outcomes. Therefore, it is implausible to expect the bias term to cancel out.
+
+## Question 9
+
+### Part A
+
+The model for the expected outcome in the assigned control group looks like this;
+
+$$E[Y_i(z = 0)] = E[Y_i(0)|MinComplier] * Pr(MinComplier) + E[Y_i(0)|MaxComplier] * Pr(MaxComplier) + E[Y_i(0)|NeverTaker] * (1 - Pr(MinComplier) - Pr(MaxComplier))$$
+The model for the expected outcome in the assigned minimum effort treatment group looks like this;
+
+$$E[Y_i(z = 1)] = E[Y_i(1)|MinComplier] * Pr(MinComplier) + E[Y_i(0)|MaxComplier] * Pr(MaxComplier) + E[Y_i(0)|NeverTaker] * (1 - Pr(MinComplier) - Pr(MaxComplier))$$
+
+The model for the expected outcome in the assigned maximum effort treatment group looks like this;
+
+$$E[Y_i(z = 2)] = E[Y_i(1)|MinComplier] * Pr(MinComplier) + E[Y_i(1)|MaxComplier] * Pr(MaxComplier) + E[Y_i(0)|NeverTaker] * (1 - Pr(MinComplier) - Pr(MaxComplier))$$
+### Part B
+
+Since the proportion of each latent types can be estimated, we use our usual approach to solve for the CACEs.
+
+For the minimum effort group, the CACE can be modeled the following way;
+
+$$CACE = \frac{E[Y_i(z = 1)] - E[Y_i(z = 0)]}{Pr(MinComplier)} = E[Y_i(1)-Y_i(0)|MinComplier]$$
+We also know what the ITT will look like for the minimum effort group;
+
+$$ITT = E[Y_i(1)-Y_i(0)|MinComplier] * ITT_D$$
+
+Therefore,
+
+$$CACE = E[Y_i(1)-Y_i(0)|MinComplier] = \frac{ITT}{ITT_D}$$
+
+Given that we can compute ITT and $ITT_D$ of the experiment, we can also identify the CACE of the minimum effort group.
+
+For the maximum effort group, the CACE can be modeled the following way;
+
+$$CACE = \frac{E[Y_i(z = 2)] - E[Y_i(z = 1)]}{Pr(MaxComplier)} = E[Y_i(1)-Y_i(0)|MaxComplier]$$
+We also know what the ITT will look like for the maximum effort group;
+
+$$ITT = E[Y_i(1)-Y_i(0)|MaxComplier] * ITT_D$$
+
+Therefore,
+
+$$CACE = E[Y_i(1)-Y_i(0)|MaxComplier] = \frac{ITT}{ITT_D}$$
+Given that we can compute ITT and $ITT_D$ of the experiment, we can also identify the CACE of the maximum effort group.
+
+### Part C
+
+```{r}
+treatment.1.compliers <- 7500 * 0.2997
+treatment.2.compliers <- 7500 * 0.4731
+total.n <- 7500 + 7500 + 317182
+
+treatment.1.compliers / total.n * 100
+treatment.2.compliers / total.n * 100
+```
+
+The maximal compliers comprise 0.6766622% of the subject pool. The minimal compliers comprise 1.068164% of the subject pool.
+
+### Part D
+
+To estimate the average treatment effect among a complier group, we will need to estimate the CACE.
+
+Let's begin with the minimal effort group.
+
+```{r}
+mean.treatment <- 55.91
+mean.control <- 55.89
+
+ITT <- mean.treatment - mean.control
+
+ITT_D <- 0.2997
+
+CACE <- ITT / ITT_D
+CACE
+```
+The CACE for the Minimal Effort is 0.0667334. The estimated average treatment effect of the phone calling treatment among Minimal Compliers is a 0.0667334 percentage point increase in the probability of voting.
+
+Now, let's do the maximal effort group.
+
+```{r}
+mean.treatment2 <- 56.53
+mean.treatment1 <- 55.91
+
+ITT <- mean.treatment2 - mean.treatment1
+
+ITT_D <- 0.4731 - 0.2997
+
+CACE <- ITT / ITT_D
+CACE
+```
+The CACE for the Maximum Effort is 3.575548. The estimated average treatment effect of the phone calling treatment among Maximal Compliers is a 3.575548 percentage point increase in the probability of voting.
+
+In conclusion, the estimated average treatment effect among the maximal compliers was higher than the estimated average treatment effect among the minimal compliers.
+
+## Question 10
+
+### Part A
+
+```{r}
+library(foreign)
+beijing.all <- read.dta("Problem 5.10 Guan and Green.dta")
+
+#### Problem 5.10a ####
+
+# get rid of a couple of observations with missing outcome data
+beijing <- na.omit(beijing.all)
+Z <-     beijing$treat2
+Y <-     beijing$turnout
+D <-     beijing$contact
+clust <- beijing$dormid
+
+ITT <- mean(Y[Z==1]) - mean(Y[Z==0])
+ITT
+```
+The estimated ITT is 0.1319296.
+
+### Part B
+
+```{r}
+library(ri)
+set.seed(1234567) 
+probs <- genprobexact(Z,clustvar=clust)  
+itt <- estate(Y,Z,prob=probs)
+itt
+
+numiter <- 10000
+
+# clustered assignment
+perms <- genperms(Z,maxiter=numiter,clustvar=clust)    
+Ys <- genouts(Y,Z,ate=0)
+distout <- gendist(Ys,perms,prob=probs)
+
+# two-tailed comparison
+p.value <- sum(abs(distout) >= abs(itt))        
+p.value 
+```
+
+The number of simulated ITTs that were as large in absolute value as the actual estimated ITT is 0, corresponding to a p-value of 0, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the treatment assignment caused any effect (regardless of the direction of the effect). Our sharp null hypothesis was that that $ITT_i$ is equal to 0 for all i. The alternative hypothesis is that $ITT_i$ is not equal to 0 for all i. Given that our p-value is much lower than 0.05, we have enough evidence to reject the null hypothesis and conclude that the estimated ITT is not zero for all of our observations.
+
+### Part C
+
+```{r}
+itt <- estate(Y,Z,prob=probs)
+itt
+
+ittd <- estate(D,Z,prob=probs)
+ittd
+
+cace <- itt/ittd
+cace
+```
+
+The CACE is 0.1489402.
+
+### Part D
+
+The model for the expected turnout in the control group will look like this;
+
+$$E[Y_i(0)|d_i(1) = 1]*ITT_D + E[Y_i(0)|d_i(1) = 0]*(1-ITT_D) $$
+The model for the expected turnout in the treatment group will look like this;
+
+$$E[Y_i(1)+0.01|d_i(1) = 1]*ITT_D + E[Y_i(0)+0.01|d_i(1) = 0]*(1-ITT_D) $$
+
+
+We can further simplify the model for the expected turnout in the treatment group like this;
+
+$$E[Y_i(1)|d_i(1) = 1]*ITT_D + E[Y_i(0)|d_i(1) = 0]*(1-ITT_D) + 0.01 $$
+Therefore, the new ITT will look like this;
+
+$$ITT = E[Y_i(1) - Y_i(0)|d_i(1) = 1] * ITT_D + 0.01 = CACE*ITT_D+0.01$$
+From the above equation, we can also create a model for the CACE.
+
+$$CACE = \frac{ITT - 0.01}{ITT_D}$$
+
+### Part E
+
+Now, let's estimate the new CACE.
+
+```{r}
+itt <- estate(Y,Z,prob=probs) - 0.01
+itt
+
+ittd <- estate(D,Z,prob=probs)
+ittd
+
+cace <- itt/ittd
+cace
+```
+
+Now, the estimated CACE will be 0.1376509.
+
+### Part F
+
+```{r}
+itt <- estate(Y,Z,prob=probs) + 0.03
+itt
+
+ittd <- estate(D,Z,prob=probs)
+ittd
+
+cace <- itt/ittd
+cace
+```
+
+Now, the estimated CACE will be 0.1828084.
+
+## Question 11
+
+### Part A
+
+```{r}
+# Reproduce Dataset
+Z <- c(rep("baseline", 2572), rep("treatment", 486+2086), rep("placebo", 470+2109))
+D <- c(rep(0, 2572), rep(1, 486), rep(0,2086), rep(1, 470), rep(0,2109))
+Y <- c(rep(1, round(2572*0.3122)), rep(0,round(2572*(1-0.3122))),
+       rep(1, round(486*0.3909)), rep(0,round(486*(1-0.3909))),
+       rep(1, round(2086*0.3274)), rep(0,round(2086*(1-0.3274))),
+       rep(1, round(470*0.2979)), rep(0,round(470*(1-0.2979))),
+       rep(1, round(2109*0.3215)), rep(0,round(2109*(1-0.3215))))
+```
+
+```{r}
+pr.c.treatment <- mean(D[Z=="treatment"])
+pr.c.treatment
+pr.c.placebo <- mean(D[Z=="placebo"])
+pr.c.placebo
+```
+
+The proportion of Compliers based on subjects' responses to the treatment is 0.188958. The proportion of Compliers based on subjects' responses to the placebo is 0.1822412. These proportions are very close to each other, so they must be consistent with the null hypothesis that both groups have the same proportion of Compliers. Let's ensure that this is the case by conducting a two-proportions z-test.
+
+```{r}
+prop.test(x = c((length(D[Z=="treatment" & D == 1])), length(D[Z=="placebo" & D == 1])), n = c(length(D[Z == "treatment"]), length(D[Z == "placebo"])))
+```
+The p-value of the two-proportions z-test was 0.5591. We are unable to reject the null hypothesis. So, these proportions are consistent with the null hypothesis that both groups have the same proportion of Compliers.
+
+### Part B
+
+```{r}
+rate.nt.treatment <- mean(Y[Z=="treatment" & D==0])
+rate.nt.placebo <- mean(Y[Z=="placebo" & D==0])
+rate.nt.treatment
+rate.nt.placebo
+```
+
+The turnout rate among the never-takers in the treatment group was 0.3274209. The turnout rate among the never-takers in the placebo group was 0.3214794. These proportions are very close to each other, so they must be consistent with the null hypothesis that both groups have the same rate of turnout. Let's ensure that this is the case by conducting a two-proportions z-test.
+
+```{r}
+prop.test(x = c((length(Y[Z=="treatment" & D == 0 & Y == 1])), length(Y[Z=="placebo" & D == 0 & Y == 1])), n = c(length(Y[Z == "treatment" & D == 0]), length(Y[Z == "placebo" & D == 0])))
+```
+
+The p-value of the two-proportions z-test was 0.7054. We are unable to reject the null hypothesis. So, these proportions are consistent with the null hypothesis that both groups have the same rate of turnout. This comparison is informative because it tells us if there were differences in the untreated outcomes between the Never-takers in the treatment and the placebo groups. Hence, we can learn if there were systematic differences between the never-takers in these two groups.
+
+### Part C
+
+```{r}
+itt.placebo <- mean(Y[Z=="placebo"]) - mean(Y[Z=="baseline"])
+cace.placebo <- itt.placebo/pr.c.placebo
+cace.placebo
+```
+The estimated CACE is 0.02726498, which corresponds to a 2.726498 percentage point increase in the probability of voting among compliers because of the placebo. This estimate is not consistent with the substantive assumption that the placebo has no effect on turnout because we would expect the CACE to be zero. However, we must do hypothesis testing (either the conventional way or with randomization inference) to actually identify whether this CACE is different than zero with statistical significance.
+
+### Part D
+
+```{r}
+## Method 1: ITT/ITTd
+itt.treatment <- mean(Y[Z=="treatment"]) - mean(Y[Z=="baseline"])
+cace.treatment1 <- itt.treatment/pr.c.treatment
+cace.treatment1
+
+## Method 2: Conditioning on compliance, compare treated to placebo.
+cace.treatment2 <- mean(Y[Z=="treatment" & D==1]) - mean(Y[Z=="placebo" & D==1])
+cace.treatment2
+```
+
+With the first method, the CACE is 0.1440329. The estimated average treatment effect of the canvassing treatment among Compliers is a 14.40329 percentage point increase increase in the probability of voting. 
+
+With the second method, the CACE is 0.09307416. The estimated average treatment effect of the canvassing treatment among Compliers is a 9.307416 percentage point increase in the probability of voting.
+
+
+## Question 12
+
+### Part A
+
+I am proposing an experimental design that randomly manipulates the level of compliance. Let's imagine that I was contacted by a high school to run this experiment. The high school students will be randomly allocated to three experimental groups. The students in the control group will not be assigned to any tutoring sessions. The students in the first treatment group will be assigned to two days of the tutoring session. The students in the second treatment group will eb assigned to a single day of the tutoring session.
+
+In this experiment, we will have two types of Compliers: those who will attend the two-day session (and they will also end up complying to the one-day session, because attending two days implies attending one session, as well), and those who will only attend the one-day session. Likewise, this design assumes that there are only three latent groups (no type that would come to the tutoring session if and only if they were assigned to the one-day session).
+
+With this experimental design, we will be able to determine the average outcomes of the control, the first treatment, and the second treatment groups. We will also be able to determine what percent of students in each treatment group complied.
+
+### Part B
+
+Since the proportion of each latent types can be estimated from our experimental design, we use our usual approach to solve for the CACEs.
+
+For the two-day session group, the CACE can be modeled the following way;
+
+$$CACE = \frac{E[Y_i(z = 1)] - E[Y_i(z = 0)]}{Pr(2DayComplier)} = E[Y_i(1)-Y_i(0)|2DayComplier]$$
+
+We also know what the ITT will look like for the two-day session group;
+
+$$ITT = E[Y_i(1)-Y_i(0)|2DayComplier] * ITT_D$$
+
+Therefore,
+
+$$CACE = E[Y_i(1)-Y_i(0)|2DayComplier] = \frac{ITT}{ITT_D}$$
+
+Given that we can compute ITT and $ITT_D$ of the experiment, we can also identify the CACE of the two-day session group.
+
+For the one-day session group, the CACE can be modeled the following way;
+
+$$CACE = \frac{E[Y_i(z = 2)] - E[Y_i(z = 1)]}{Pr(1DayComplier)} = E[Y_i(1)-Y_i(0)|1DayComplier]$$
+We also know what the ITT will look like for the one-day session group;
+
+$$ITT = E[Y_i(1)-Y_i(0)|1DayComplier] * ITT_D$$
+
+Therefore,
+
+$$CACE = E[Y_i(1)-Y_i(0)|1DayComplier] = \frac{ITT}{ITT_D}$$
+
+Given that we can compute ITT and $ITT_D$ of the experiment, we can also identify the CACE of the one-day session group.
+
+### Part C
+
+Let's first take a look at the expected performance in the control group;
+
+$$E[Y_i(0)|D_i(0) = 0]* Pr(Control) + E[Y_i(1)|D_i(0) = 1]*Pr(AlwaysTaker)$$
+
+Now, the expected performance in the treatment group will look like this;
+
+$$E[Y_i(1)|D_i(1) = 1]* Pr(Complier) + E[Y_i(1)|D_i(0) = 1]*Pr(AlwaysTaker)$$
+We can subtract the expected performance in the control group from the one in the treatment group to get the ITT.
+
+$$ITT = (E[Y_i(1)|D_i(1) = 1]* Pr(Complier) + E[Y_i(1)|D_i(0) = 1]*Pr(AlwaysTaker)) - (E[Y_i(0)|D_i(0) = 0]* Pr(Control) + E[Y_i(1)|D_i(0) = 1]*Pr(AlwaysTaker)) $$
+
+Once again, we can use our CACE formula;
+
+$$CACE = ITT / ITT_D = \frac{(E[Y_i(1)|D_i(1) = 1]* Pr(Complier) + E[Y_i(1)|D_i(0) = 1]*Pr(AlwaysTaker)) - (E[Y_i(0)|D_i(0) = 0]* Pr(Control) + E[Y_i(1)|D_i(0) = 1]*Pr(AlwaysTaker))}{ITT_D}$$
+
+Therefore, we are able to identify the CACE in this case, as well.

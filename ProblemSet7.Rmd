@@ -1,0 +1,347 @@
+---
+title: "Problem Set 7"
+author: "Kerem Tuncer"
+date: "11/27/2021"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  word_document: default
+---
+
+## Question 1
+
+### Part A
+
+Equation 7.1 presents the switching equation for whether or not the outcome is reported. The term on the left, which is $r_i$, represents whether or not we observe the outcome. The $r_i$ will be equal to the $r_i(0)$ - which denotes whether or not the outcome data for subject is reported when assigned and administered the control -  if $z_i$ is equal to zero. This is because the right side of the switching equation will be equal to zero and we will get $r_i = r_i(0)(1- 0) + 0 = r_i(0)$. Furthermore, the $r_i$ will be equal to the $r_i(1)$ - which denotes whether or not the outcome data for subject is reported when assigned and administered the treatment -  if $z_i$ is equal to one. This is because the left side of the switching equation will be equal to zero and we will get $r_i = r_i(0)(1-1) + r_i(1)1 = r_i(1)$.
+
+### Part B
+
+This expression represents the exclusion restriction because it is showing that the potential outcome that depends on the treatment assignment would be the same regardless of what $r(z)$ is equal to. In other words, the potential outcome that depends on the assignment of treatment stays the same no matter if that outcome is reported or not. So, the potential outcome is independent of whether the outcome is reported or not.
+
+### Part C
+
+If-Treated-Reporters are those that have $r_i(1) = 1$ and $r_i(0) = 0$. In English, this means that If-Treated-Reporters are those for which we have the outcomes reported when they are assigned to treatment but we do not have the outcomes reported when they are assigned to control. Hence, their outcomes will be reported if and only if they are assigned to the treatment.
+
+### Part D
+
+Extreme value bounds are bounds on the treatment effect, estimating the largest and smallest ATEs that one would obtain if the missing information were filled in with extremely high or low outcomes. To compute the extreme value bounds, we first have to define a range of possible outcomes for all subject outcomes, missing or not. Then, to find the upper bound on the treatment effect estimate, we will substitute the maximum value in the range of possible outcomes  for the missing values in the treatment group and the minimum value for the missing values in the control group. The lower bound is formed by filling in the missing values in the treatment group with the minimum value in the range and the missing values in the control group with the maximum value. Although the extreme value bounds are sample estimates and therefore subject to sampling variability, extreme value bounds tend to be successful in bracketing the true ATE (but not always).
+
+## Question 2
+
+Let's suppose that $r_i(1) = r_i(0)$ for all subjects in an experiment. Therefore, all subjects are either Always-Reporters or Never-Reporters. We will also assume that $ATE_{AR}=ATE_{NR}$.
+
+Then, we can say the following;
+
+$$E[Y_i(1)|R_i(1) = 1] - E[Y_i(0)|R_i(0) = 1] = E[Y_i(1)|R_i(1) = 0] - E[Y_i(0)|R_i(0) = 0]$$
+And so, $E[Y_i(1) - Y_i(0)]$ will be equal to the following;
+
+\begin{aligned}
+= E[R_i(1)] * E[Y_i(1)|R_i(1) = 1] + (1 - E[R_i(1)]) * E[Y_i(1)|R_i(1) = 0] \\
+-E[R_i(0)] * E[Y_i(0)|R_i(0) = 1] - (1 - E[R_i(0)]) * E[Y_i(0)|R_i(0) = 0] \\
+= E[R_i(1)] * (E[Y_i(1)|R_i(1) = 1] - E[Y_i(0)|R_i(0) = 1]) \\
++ (1 - E[R_i(0)]) * (E[Y_i(1)|R_i(1) = 0] - E[Y_i(0)|R_i(0) = 0]) \\
+= (E[R_i(1)] + 1 - E[R_i(0)]) * (E[Y_i(1)|R_i(1) = 1] - E[Y_i(0)|R_i(0) = 1]) \\
+= (1) * (E[Y_i(1)|R_i(1) = 1] - E[Y_i(0)|R_i(0) = 1]) \\
+= E[Y_i(1)|R_i(1) = 1] - E[Y_i(0)|R_i(0) = 1]
+\end{aligned}
+
+In conclusion, the difference-in-means for subjects with observable outcomes show in equation 7.6 will be the same as the overall ATE in equation 7.5.
+
+## Question 3
+
+### Part A
+
+```{r}
+Y_0 <- c(4,5,6,2,3)
+Y_1 <- c(0,5,4,5,6)
+r_0 <- c(1,1,1,0,0)
+r_1 <- c(0,1,1,1,1)
+
+schedule <- cbind(Y_0, Y_1, r_0, r_1)
+schedule
+```
+
+The proportion of missing outcomes is expected to be different for the treatment and the control groups.
+
+```{r}
+mean(schedule[,3])
+mean(schedule[,4])
+```
+
+However, the difference-in-means estimator is unbiased when applied to observed outcomes in the treatment and control groups.
+
+```{r}
+true_ate <- mean(schedule[,2] - schedule[,1])
+true_ate
+
+schedule <- as.data.frame(schedule)
+mean(schedule$Y_1[schedule$r_1 == 1]) - mean(schedule$Y_0[schedule$r_0 == 1])
+```
+
+### Part B
+
+```{r}
+Y_0 <- c(4,5,6,2,3)
+Y_1 <- c(0,5,4,20,6)
+r_0 <- c(1,1,1,1,0)
+r_1 <- c(0,1,1,1,1)
+
+schedule <- cbind(Y_0, Y_1, r_0, r_1)
+schedule
+```
+
+The proportion of missing outcomes is expected to be the same for the treatment and the control groups.
+
+```{r}
+mean(schedule[,3])
+mean(schedule[,4])
+```
+
+However, the difference-in-means estimator is biased when applied to observed outcomes in the treatment and control groups.
+
+```{r}
+true_ate <- mean(schedule[,2] - schedule[,1])
+true_ate
+
+schedule <- as.data.frame(schedule)
+mean(schedule$Y_1[schedule$r_1 == 1]) - mean(schedule$Y_0[schedule$r_0 == 1])
+```
+
+## Question 4
+
+I will use smallest value (regardless of experimental condition) as the minimum and the largest value (regardless of experimental condition) as the maximum. 
+
+```{r}
+Y_0 <- c(1,2,3,4)
+Y_1 <- c(1,2,4,5)
+r_0 <- c(1,1,1,0)
+r_1 <- c(1,1,1,1)
+
+schedule <- cbind(Y_0, Y_1, r_0, r_1)
+schedule
+```
+
+```{r}
+true_ate <- mean(schedule[,2] - schedule[,1])
+true_ate
+```
+Let's assume that the first two observations were randomly assigned to treatment and the rest were assigned to control.
+
+Lower Bound;
+
+```{r}
+mean.t <- (1 + 2) / 2
+mean.t
+
+mean.c <- (3 + 5) / 2
+mean.c
+
+mean.t - mean.c
+```
+
+Upper Bound;
+
+```{r}
+mean.t <- (1 + 2) / 2
+mean.t
+
+mean.c <- (3 + 1 ) / 2
+mean.c
+
+mean.t - mean.c
+```
+
+As you can see, the true ATE of 0.5 is not inside of [-2.5, -0.5].
+
+## Question 5
+
+It would be a logical first step for any researcher to start by assessing whether rates of missingness differ between treatment and control groups (question i). One way to do that would be to conduct a two-proportions z-test. In this test, if the null hypothesis cannot be rejected, then the researcher has a reason to believe that missingness may not be related to treatment assignment and also that it is likely that the missingness is independent of potential outcomes. However, to confirm that MIPO holds, the researcher should also confirm that the subjects’ background attributes (question ii) do not predict which subjects have missing outcomes and also that the interaction between the background attributes and treatment assignment do not predict which subjects have missing outcomes (question iii). Confirming that the subjects’ background attributes (question ii) do not predict which subjects have missing outcomes can be done by conducting an F-test - a regression of r_i on prognostic covariates should produce an F test statistic that is non-significant when compared to the sampling distribution of F statistics. Likewise, confirming that the interaction between the background attributes and treatment assignment do not predict which subjects have missing outcomes can be tested by conducting another F-test - this time, a regression of r_i on prognostic covariates and experimental assignment. If these two F-tests produce non-significant p-values, then the researcher can assume MIPO - that missigness is independent of potential outcomes. In that case, attrition should not generate bias when the ATE is estimated by dropping missing observations with missing outcomes. However, before interpreting the estimated ATE by excluding missing observations, the researchers should still confirm qualitatively that the missingness is due to a random procedure.
+
+Now, let's assume that the two-proportions z-test (question 1) produced a significant p-value, indicating that missigness is different among experimental conditions but the other two f-tests produced non-significant p-values (questions ii and iii). Then, the researcher has enough evidence to believe that the MIPO|X assumption will hold. This means that missingness is independent of potential outcomes conditional on covariates. If that is the case, the researcher can estimate a causal effect with inverse probability weighting and running a weighted regression. The coefficient of this regression will estimate the ATE for the entire subject pool.
+
+Yet, if the p-values of these two f-tests are statistically significant enough to reject the null hypotheses, then the MIPO|X assumption will most likely be invalid. Then, the researcher would be left with the conclusion that attrition is neither random nor random conditional on X. Then, the interpretation of the causal effect would require the researcher to estimate either the extreme value bounds - designed to bracket the sample ATE - or the trimming bounds - designed to bracket the ATE among Always-Reporters. It is also important to note that the researcher should mention and discuss the monotonicity assumption is his/her analysis if he/she were to use the trimming bounds.
+
+## Question 6
+
+I copied the code from the Homework file in Courseworks. However, there seems to be a discrepancy between what the question asks and what the code does. In the question, we are told to use the covariates of sex and phone number; however, in the code, the age variable is also used in the glm() model. Therefore, I have decided to do delete the age variable in the glm() model.
+
+```{r}
+# Exercise 7.6 (Voucher experiment)
+      # clear objects in memory
+library(ri)         # load the RI package
+library(foreign)    # package allows R to read Stata datasets
+set.seed(1234567)   # random number seed, so that results are reproducible
+
+# Set your working directory
+# setwd("")
+
+# Data are from Angrist, Bettinger, and Kremer 2006
+
+angrist <- read.dta("Problem 7.6 Angrist.dta")
+
+# Subset
+angrist_s <- subset(angrist, age>=9 & age <= 25 & checkid==1 )
+
+angrist_s <- within(angrist_s,{
+  read[is.na(read)] <- 0
+  sex <- sex_name
+  observed <- 1 - (read == 0)
+  
+  # Predicted propensity scores from logistic model
+  probobs <- glm(observed~(vouch0*sex)+(vouch0*phone)+(vouch0*age),
+                 family=binomial(link="logit"))$fitted
+  weights <- 1/probobs
+})
+
+# Verify that all probabilities are less than one and greater than zero
+with(angrist_s, {
+  rbind(summary(probobs[vouch0==0]),
+        summary(probobs[vouch0==1]))
+})
+
+# Coefficients for unweighted regression (restricting analysis to observed subjects)
+lm(read~vouch0, data=subset(angrist_s, observed==1))$coefficients
+
+# Coefficients for IPW regression (restricting analysis to observed subjects)
+lm(read~vouch0, weights=weights, data=subset(angrist_s, observed==1))$coefficients
+```
+
+The coefficient for vouch0 is 0.723. Under the MIPO|X, this means that the estimated average treatment effect of winning the voucher was 0.723 when compensating for different rates of missingness across subgroups. In other words, winning the voucher resulted in an increase of 0.723 in reading scores, when compensating for different rates of missingness across subgroups.
+
+## Question 7
+
+(a) Excluding subjects that appear to understand what hypothesis the experiment is testing would help defend the excludability assumption so that subjects do not produce outcomes differently because they know the experiment. However, excluding them could lead to bias depending on what the defined outcomes are. For example, if the experiment is testing an outcome that is correlated with intelligence or reasoning skills, then there could definitely be bias. This is because intelligence and reasoning skills would enable a participant to better predict what hypothesis the experiment is testing. Therefore, we would be missing data from individuals who would have produced higher outcome scores (assuming that the correlation between intelligence/reasoning and outcome is positive).
+
+(b) Excluding subjects that are not taking the experiment seriously would help defend the excludability assumption so that subjects do not produce outcomes differently because the treatment effect would include not only the administration of the treatment but their lack of seriousness. However, excluding them could lead to bias depending on what the defined outcomes are. For example, if the experiment is testing an outcome that is correlated with attentiveness or maturity, then there could definitely be bias. This is because attentiveness and maturity would enable a participant to pay more attention and be more serious with the experiment. Therefore, we would be missing data from individuals who would have produced higher outcome scores (assuming that the correlation between attentiveness/maturity and outcome is positive).
+
+(c) Excluding subjects that fail to follow directions would help defend the excludability assumption so that subjects do not produce outcomes differently because the treatment effect would include not only the administration of the treatment but their inability to follow directions. However, excluding them could lead to bias depending on what the defined outcomes are. For example, if the experiment is testing an outcome that is correlated with intelligence, then there could definitely be bias. This is because intelligence would enable a participant to be able to follow the directions of the experiment better. Therefore, we would be missing data from individuals who would have produced higher outcome scores (assuming that the correlation between intelligence and outcome is positive).
+
+## Question 8
+
+### Part A
+
+This pattern in the data will give a misleading impression that retailers discriminate in favor of Hispanics because it fails to account for the proportion of participants that were not asked for their ID at all. While 26% of white shoppers were not asked for their ID, only 15% of hispanic shoppers were not asked for their ID. Therefore, we have many more outcomes missing (higher attrition) among the white shoppers than among the hispanic shoppers. Furthermore, it is probable that these white shoppers' IDs would have been accepted if requested because they were not even asked in the first place.
+
+### Part B
+
+For the upper bound, we will assume that all Hispanics (whites) who were not asked ID would have had their ID accepted (rejected).
+
+For the lower bound, we will assume that all Hispanics (whites) who were not asked ID would have had their ID rejected (accepted). 
+
+```{r}
+ate_upper <- ((68+17)/111) - (50/106)
+ate_upper
+
+ate_lower <- (68/111) - ((50+28)/106)
+ate_lower
+```
+
+The upper extreme value bound for the ATE is 0.294 and the lower extreme value bound for the ATE is -0.123. This means that we expect the sample estimated ATE to be inside [-0.123, 0.294]. Hence, we estimate the difference in percentage point of getting ID request and accepted between hispanic and white shoppers to be between -0.123 and 0.294 in this sample.
+
+### Part C
+
+The monotonicity assumption states that any participants who would not be missing outcomes if assigned to the control group would also not be missing outcomes if assigned to the treatment group. In the case of this experiment, this means that any shopper who would not be missing outcomes if they were white would also not be missing outcomes if they were hispanic. The monotonicity assumption is defensible in this application. This is because if a treatment condition participant (hispanic) switched to control (white), her attrition status could either not change or would change discriminatorily (meaning that she would not get IDed anymore and that her outcome would be missing). Furthermore, if a control group participant (white) change to treatment group (became hispanic), her attrition status would be the same because we would not expect the hispanic person to not get IDed (given the current racial dynamics of the US).
+
+```{r}
+# Reproduce dataset
+Z <- c(rep(0, 106), rep(1, 111)) #W =0, H=1
+y <- c(rep(NA, 28), rep(1, 50), rep(0, 28), 
+       rep(NA, 17), rep(1,68), rep(0, 26))
+
+# Calculate rates of missingness by treatment group
+prob.na.treated <- sum(is.na(y[Z==1]))/length(y[Z==1])
+prob.na.control <- sum(is.na(y[Z==0]))/length(y[Z==0])
+
+# Calculate Q
+Q <- ((1 - prob.na.treated) - (1- prob.na.control))/(1 - prob.na.treated) 
+
+# Sort the treatment group outcomes
+Y.Z1 <- sort(y[Z==1])
+
+# Select from the lowest up to the 1-Qth percentile
+Y.Z1.low <- Y.Z1[1:ceiling(length(Y.Z1)*(1-Q))]
+
+# Select from the highest down to the Qth percentile
+Y.Z1.high <- Y.Z1[ceiling(length(Y.Z1)*Q):length(Y.Z1)]
+
+# Calculate trimming bounds
+trim <- c(mean(Y.Z1.low) - mean(y[Z==0], na.rm=TRUE), 
+          mean(Y.Z1.high) - mean(y[Z==0], na.rm=TRUE))
+
+trim
+```
+
+The lower end of the trimming bound is 0.042 and the upper end of the trimming bound is 0.188. This means that we expect the estimated ATE among Always-Reporters to be inside between 0.042 and 0.188. Hence, we estimate the difference in percentage point of getting ID request and accepted between hispanic and white shoppers to be between 0.042 and 0.188 among always-reporters.
+
+## Question 9
+
+### Part A
+
+As mentioned in the textbook, when missingness is independent of potential outcomes, ignoring missing data and comparing group means among the observed will still yield unbiased inferences. If we assume that the war zone in the civil war is a randomly chosen area (so, no specific reason for an area to be the war zone) and that the civil war is a randomly occurring event, then we should not expect a comparison of the non-missing observations to have bias. The difference-in-means estimator should yield unbiased results in this scenario.
+
+### Part B
+
+In this scenario, we expect the missingness to be dependent on the potential outcomes. This is because it is likely that a relationship exists between living in the same house and socioeconomic status. Those that are poorer probably do not own the house/place they are living and have to move. Likewise, those that are poorer are probably more likely to not graduate from high school. Therefore, we would be missing outcomes from subjects that would not have graduated from high school. Given that socioeconomic status is a big factor in what I have mentioned above, it is likely that missingness could be independent from potential outcomes conditional on socioeconomic status. If that is the case, then we could compute inverse probability weights and compute a weighted regression to estimate the average treatment effect for the total subject pool.
+
+## Question 10
+
+### Part A
+
+```{r}
+mean(c(0.1, 0.1, 0.099, 0.1, 0.101, 0.101))
+mean(c(0.027, 0.015, 0.026, 0.015, 0.026, 0.015))
+
+0.325 + 0.175
+
+mean(c(0.111-0.086, 0.111-0.086, 0.156-0.031, 0.156-0.031, 0.213+0.037, 0.213+0.037 ))
+```
+
+
+Let's first investigate the bias of the estimators. In all the six scenarios, the point estimate of the ATE based only on initial data collection is 0.1, which gives a mean of 0.1 and is equal to the true ATE of 0.1. On the other hand, the point estimates of the ATE based on both rounds of data collection have a mean that is extremely close to 0.1. Therefore, we can conclude that both of these estimators are unbiased. However, their precision is different because the point estimates of the estimator based only on initial data collection have a mean standard error of approximately 0.012, whereas the point estimates of the estimator based on both rounds of data collection have a mean standard error of 0.021. Hence, the estimator based only on initial data collection is definitely more precise. Lastly, the average width of the extreme value bounds based only on initial data collection is 0.5, whereas the average width of the extreme value bounds based on both rounds of data collection is 0.133. Therefore, the width of the extreme value bounds for the estimator based only on initial data collection is wider.
+
+### Part B
+
+```{r}
+mean(c(0.091, 0.091, 0.083, 0.083, 0.071, 0.071))
+0.1 - mean(c(0.091, 0.091, 0.083, 0.083, 0.071, 0.071))
+0.1 - 0.001
+
+mean(c(0.026, 0.015))
+0.276 + 0.2245
+mean(c(0.105-0.075, 0.12-0.041, 0.139+0.003))
+```
+
+
+Let's first investigate the bias of the estimators, In all the six scenarios, the point estimate of the ATE based only on initial data collection is 0.001, which gives a mean of 0.001 and is not equal to the true ATE of 0.1. On the other hand, the point estimates of the ATE based on both rounds of data collection have a mean of 0.082. Therefore, both of the estimators are biased. However, the estimator based only on initial data collection seems to be more biased. Their precision is different because the point estimates of the estimator based only on initial data collection have a mean standard error of 0.012, whereas the point estimates of the estimator based on both rounds of data collection have a mean standard error of 0.0205. Hence, the estimator based only on initial data collection is definitely more precise. Lastly, the average width of the extreme value bounds based only on initial data collection is 0.5, whereas the average width of the extreme value bounds based on both rounds of data collection is 0.084. Therefore, the width of the extreme value bounds for the estimator based only on initial data collection is much wider.
+
+### Part C
+
+```{r}
+mean(c(0.098, 0.097, 0.085, 0.086, 0.067, 0.067))
+0.1 - mean(c(0.098, 0.097, 0.085, 0.086, 0.067, 0.067))
+0.1 - 0.001
+mean(c(0.025, 0.015, 0.025, 0.015, 0.024, 0.015))
+0.2755 + 0.2245
+mean(c(0.109-0.084, 0.1435-0.0185, 0.188 + 0.062))
+```
+
+
+Let's first investigate the bias of the estimators, In all the six scenarios, the point estimate of the ATE based only on initial data collection is 0.001, which gives a mean of 0.001 and is not equal to the true ATE of 0.1. On the other hand, the point estimates of the ATE based on both rounds of data collection have a mean of 0.083. Therefore, both of the estimators are biased. However, the estimator based only on initial data collection seems to be more biased. Their precision is different because the point estimates of the estimator based only on initial data collection have a mean standard error of 0.012, whereas the point estimates of the estimator based on both rounds of data collection have a mean standard error of 0.0198. Hence, the estimator based only on initial data collection is definitely more precise. Lastly, the average width of the extreme value bounds based only on initial data collection is 0.5, whereas the average width of the extreme value bounds based on both rounds of data collection is 0.133. Therefore, the width of the extreme value bounds for the estimator based only on initial data collection is much wider.
+
+### Part D
+
+I would say that estimation based on both rounds of data analysis have the greatest comparative advantage in both scenarios in which missingness is related to potential outcomes and also in scenarios in which missingness is related to potential outcomes in the first round but unrelated to potential outcomes in the second round. The reason why I am having a hard time to pick is because scenarious in which missingness is related to potential outcomes has a slightly better precision but also has a slightly wider extreme value bound. If I were to pick, I would say that the scenarios in which missingness is related to potential outcomes in the first round but unrelated to potential outcomes in the second round have a better advantage because the improvement (decrease) in the width of the extreme value bound is more significant than the improvement in precision. To be more specific, the scenario with (A,5) and N = 400 control follow-ups will give the most comparative advantage.
+
+Estimates based only on initial data collection have the greatest comparative advantage over estimates based on both rounds of data collection in scenarios in which missingness is unrelated to potential outcomes. To be more specific, I would say that the scenario with (50,50) and N = 100 control follow-ups will give the most comparative advantage because the estimate is closer to the true ate, the precision is more than twice better, and the width (although not better) has the smallest difference between the width from estimates based on both rounds of data collection.
+
+
+
+
+
+
+
+
+
+
+

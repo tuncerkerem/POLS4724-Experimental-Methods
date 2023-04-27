@@ -1,0 +1,872 @@
+---
+title: "Problem Set 4"
+author: "Kerem Tuncer"
+date: "10/17/2021"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+## Question 1
+
+### Part A
+
+A covariate is any variable that is (in principle) measured prior to the intervention and is unaffected by whether the subject is treated or untreated. The values of a covariate are assumed to be fixed constants. We measure covariates before the random allocation of treatment and control because we do not want the covariates to be affected by the intervention.
+
+### Part B
+
+The disturbance term is the unobserved part of a regression model with potential outcomes. It comprises the idiosyncratic variation in untreated responses $Y_i(0) - \mu_{Y(0)}$ and the idiosyncratic variation in treatment effects $[(Y_i(1) - \mu_{Y(1)}) - (Y_i(0)-\mu_{Y(0)})]d_i$. When an observation is assigned to the treatment group, the disturbance term is equal to the difference between the treated potential outcome and the average value of the treated potential outcomes for all N Subjects. When an observation is assigned to the control group, the disturbance term is equal to the difference between the untreated potential outcome and the average value of the untreated potential outcomes for all N Subjects.
+
+### Part C
+
+$$E(\widehat{ATE}) = E[Y_i - cX_i|D_i = 1] - E[Y_i-cX_i|D_i=0]$$
+
+Given that $E(X+Y) = E(X) + E(Y)$
+
+$$E[Y_i |D_i = 1] - E[cX_i|D_i=1] - E[Y_i|D_i=0] + E[cX_i|D_i=0]$$
+
+Given that $E[cX_i|D_i=1] = E[cX_i|D_i=0]$, combining their terms will equal zero.
+
+Finally, we will end up with this:
+
+$$E(\widehat{ATE}) = E(Y_i(1)) - E(Y_i(0))$$
+### Part D
+
+Let's consider the bivariate regression of $Y_i$ on $d_i$.
+
+Then the slope will be equal to
+
+$$\frac{Cov(Y_i, d_i)}{Var(d_i)}$$
+
+This is equal to the following:
+
+$$\frac{\sum{Y_i}(d_i-\overline{d})}{\sum{d_i}(d_i-\overline{d})} = \frac{\sum{Y_i}d_i - \overline{d}\sum{Y_i}}{\sum{d_i}d_i - \overline{d} \sum{d_i}} = \frac{N_T\overline{Y}_T-\frac{N_T}{N}N\overline{Y}}{N_T-\frac{N_T}{N}N_T}$$
+
+We can write the mean of Y as a weighted average of the mean outcomes in the treatment and control groups.
+
+$$\overline{Y}= \frac{N_T}{N}\overline{Y}_T + \frac{N_C}{N}\overline{Y}_C = \frac{N_T}{N}\overline{Y}_T + \frac{N-N_T}{N} \overline{Y}_C$$
+
+Then, we can substitute this to the equation we had above.
+
+
+$$\frac{N_T\overline{Y}_T-N_T(\frac{N_T}{N}\overline{Y}_T + \frac{N-N_T}{N}\overline{Y}_C )}{N_T-\frac{N^2_T}{N}}$$
+
+$$\frac{\overline{Y}_T-(\frac{N_T}{N}\overline{Y}_T + \frac{N-N_T}{N}\overline{Y}_C )}{1-\frac{N_T}{N}}$$
+
+$$\frac{\overline{Y}_T(1-\frac{N_T}{N})-\overline{Y}_C(1-\frac{N_T}{N})}{1-\frac{N_T}{N}}$$
+Finally, we are left with the following
+
+$$\overline{Y}_T-\overline{Y}_C$$
+
+This is equal to the ATE.
+
+$$\overline{Y}_T-\overline{Y}_C = \widehat{ATE}$$
+
+## Question 2
+
+### Part A
+
+```{r}
+library(foreign)
+library(ri)
+rush <- read.dta("RushHour data for exercise 4-2.dta")
+```
+
+```{r}
+set.seed(1234567)
+Z <- rush$treat       # treatment is thinking strategies curriculum
+Y <- rush$posttest    # number of puzzled solved during the testing session
+X <- rush$pretest
+
+# RI: randomization check, testing the effect of the covariate on the treatment
+
+covs <- as.matrix(rush$pretest)     # covariate is the pretest score
+
+probs <- genprobexact(Z)
+
+numiter <- 50000   # set the number of simulated random assignments (if you set it to 48620 or higher, your results will be exact because that is the true number of possible random assignments)
+
+perms <- genperms(Z,maxiter=numiter)  
+numiter <- ncol(perms)  # reset numiter so that it is no larger than the maximum number of possible randomizations
+
+Fstat <- summary(lm(Z~covs))$fstatistic[1]  # observed F statistic
+
+Fstatstore <- rep(NA,numiter)    # initialize vector of simulated F statistics
+
+for (i in 1:numiter) {
+	Fstatstore[i] <- summary(lm(perms[,i]~covs))$fstatistic[1]
+	}
+
+mean(Fstatstore >= Fstat)    # calculate p-value
+```
+
+The p-value is equal to 0.26, which is much higher than the conventional 0.05 threshold. The null hypothesis was that the covariates were the same between the two experimental conditions and that there exists covariate balance. The alternative hypothesis is that the covariates were different between the two experimental conditions and that there exists covariate imbalance. Therefore, we cannot reject the null hypothesis that the covariates are same for the two experimental conditions. Therefore, we can say that the covariates are balanced.
+
+### Part B
+
+```{r}
+set.seed(1234567)
+perms <- genperms(Z,maxiter=numiter)
+
+probs <- genprobexact(Z)
+
+ate <- estate(Y,Z,prob=probs)
+
+Ys <- genouts(Y,Z,ate=0)
+
+distout <- gendist(Ys,perms,prob=probs)
+
+ate                         # estimated ATE
+dispdist(distout,ate)       # display p-values, 95% confidence interval, standard error under the null, and graph the sampling distribution under the null
+
+
+
+# compute confidence intervals
+Ys <- genouts(Y,Z,ate=ate)  # the statement ate=ate imposes the assumption that the true treatment effect for every unit is equal to the estimated ATE
+
+distout <- gendist(Ys,perms,prob=probs)
+
+ate
+dispdist(distout,ate)   # display p-values (ignore these), 95% confidence interval, standard error under the assumed DGP, and graph the sampling distribution under the assumption that the Y1-Y0=estimated(ATE) for all units
+
+```
+
+Using the difference-in-means estimation, we get an estimated ATE of -0.33 and a 95% confidence interval of (-2.26, 1.59).
+
+### Part C
+
+```{r}
+Y <- rush$improvement
+perms <- genperms(Z,maxiter=numiter)
+probs <- genprobexact(Z)
+ate <- estate(Y,Z,prob=probs)
+Ys <- genouts(Y,Z,ate=0)   # the statement ate=0 imposes the assumption that the true treatment effect for every unit is 0
+distout <- gendist(Ys,perms,prob=probs)
+
+ate
+dispdist(distout,ate)
+
+
+# compute confidence intervals
+Ys <- genouts(Y,Z,ate = ate)   # the statement ate=ate imposes the assumption that the true treatment effect for every unit is equal to the estimated ATE
+distout <- gendist(Ys,perms,prob=probs)
+ate
+dispdist(distout,ate)
+
+
+```
+
+Using the difference-in-means estimation, we get an estimated ATE of 1 and a 95% confidence interval of (0.11, 1.89).
+
+When comparing the 95% confidence intervals produced by difference-in-means and difference-in-differences, we can see that the interval of the difference-in-differences method is narrower. The range of the difference-in-means interval is 2.26 + 1.59 = 3.85. Whereas, the range of the difference-in-differences interval is 1.89 - 0.11 = 1.78. 
+
+This is because difference-in-differences usually produces estimates with higher precision and smaller standard error because the differencing operation reduces variance in treated and untreated outcomes.
+
+
+
+## Question 3
+
+We are told that the true ATE with a given treatment is 1.0. As expected, the average of the estimated ATEs from these nine studies is 1 for the no covariate method and also 1 for the with covariates method.
+
+However, when we cherry pick the estimated ATE for each study with the method that produces the highest estimated ATE, then our result will be biased. Here is how it will look like.
+
+```{r}
+highest_ate <- c(5, 3, 2, 6, 1, 0, -1, -4, 0)
+mean(highest_ate)
+```
+As you can see, this reporting policy will produce an average estimated ATE of 1.333 instead of the true ATE. Therefore, the reported estimate will be biased - a positive bias of 0.333.
+
+## Question 4
+
+### Part A
+
+```{r}
+teach <- read.dta("Teachers data for Table 4-1.dta")
+```
+
+```{r}
+Z  <- teach$D       # treatment
+Y1 <- teach$y1      # treated potential outcome
+Y0 <- teach$y0      # untreated potential outcome
+X <- teach$x        # pre-test
+
+Y <- Y0*(1-Z) + Y1*(Z)    # observed outcomem given random assignment
+N <- length(Z)
+
+# Part (a)
+
+# two equivalent ways to estimate the ATE: regression and difference-in-means
+summary(lm(Y~Z))
+mean(Y[Z==1])-mean(Y[Z==0])
+
+```
+The estimated slope is the same as the estimated ATE based on a difference-in-means. They are both 10.7.
+
+### Part B
+
+```{r}
+lm(Y~X,subset=Z==1)
+lm(Y~X,subset=Z==0)
+```
+
+In equation 4.6, we have two terms on the left side of the inequality. Both of these terms are equal to the slope of the linear regression of Y ~ X for the subsetted data. So, the term on the left will be equal to the coefficient estimate of X in a regression that uses only the control observations. Likewise, the term on the right will be equal to the coefficient estimate of X in a regression that uses only the treatment observations.
+
+Now, let's see if the addition of the two slopes are greater than 1.
+
+```{r}
+lm(Y~X,subset=Z==1)$coefficients[2] + lm(Y~X,subset=Z==0)$coefficients[2]
+```
+
+Yes, adding their slopes will be 1.846, which is greater than 1. So, the condition in equation 4.6 appears to hold.
+
+```{r}
+Ydiff <- Y-X
+summary(lm(Ydiff~Z))
+```
+When we used the change score (Y-X), our estimated average treatment effect ended up being 4.85, which is much lower than what we had gotten when we used Y as the dependent variable (which was 10.7). As explained in the textbook, the two approaches may generate different estimates due to chance. Therefore, it is not unexpected to have different estimated ATEs.
+
+However, we can see clear improvements in the precision of our estimates. The standard error decreased from 4.709 to 1.623, which caused the p-value to decrease significantly. This decrease in the sampling variance is expected given that the condition in equation 4.6 was met. Likwise, the adjusted R-squared increased from 0.09644 to 0.169. This also makes sense given that higher the R-squared, the smaller the estimated standard error. All in all, using a difference-in-differences approach when the conditions of equation 4.6 are met (and they were met in our scenario) will lead to more precision and less sampling variability.
+
+### Part C
+
+```{r}
+summary(lm(Y~Z+X)) 
+```
+
+The estimated coefficient of $d_i$ is 5.31. This means that the estimated average treatment effect is 5.32. Hence, the treatment increased Y by 5.32 units. On the other hand, the estimated coefficient for $X_i$ is 0.92. This means that a unit increase in X is estimated to increase Y by 0.92 units. 
+
+The estimated ATE we got when we did not include $X_i$ as an independent variable was 10.7. Evidently, the estimated ATE when including $X_i$ was approximately half of the estimated ATE when we did not include it. However, including the covariate $X_i$ increased the adjusted r-squared from 0.09644 to 0.896 and decreased the standard error of the estimated ATE from 4.709 to 1.62847. Therefore, adding $X_i$ to the model enabled us to estimate the average treatment effect more precisely.
+
+### Part D
+
+```{r}
+perms <- genperms(Z, maxiter=100000)  # simulate possible random allocations
+probs <- genprobexact(Z)
+ate <- estate(Y,Z,prob=probs)       # estimate the ATE
+Ys <- genouts(Y,Z,ate=0)            # calculate potential outcomes under sharp null of 0 effect for all units
+
+distout <- gendist(Ys,perms,prob=probs)  # generate the sampling distribution  based on the schedule of potential outcomes implied by the null hypothesis
+
+ate                                 # report the estimated ATE
+dispdist(distout,ate)  
+```
+The estimated average treatment effect is 10.7. The number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 3018, corresponding to a p-value of 0.03018, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the treatment caused any effect (regardless of the direction of the effect).
+
+Our sharp null hypothesis was that that $\tau_i$ is equal to 0 for all i. The alternative hypothesis is that $\tau_i$ is not equal to 0 for all i. Given that, our p-value is much lower than 0.05, we have enough evidence to reject the null hypothesis and conclude that the estimated average treatment effect is not zero for all of our observations.
+
+### Part E
+
+```{r}
+ateX <- estate(Y,Z,X,prob=probs)   # estimate the ATE using covariate adjustment
+distoutX <- gendist(Ys,perms,X,prob=probs)  # generate the sampling distribution  based on the schedule of potential outcomes implied by the null hypothesis
+ateX                       # report the estimated ATE
+dispdist(distoutX,ateX)    
+```
+
+The estimated average treatment effect is 5.32. The number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 271, corresponding to a p-value of 0.00271, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the treatment caused any effect (regardless of the direction of the effect).
+
+Our sharp null hypothesis was that $\tau_i$ is equal to 0 for all i. The alternative hypothesis is that $\tau_i$ is not equal to 0 for all i. Given that, our p-value is much lower than 0.05, we have enough evidence to reject the null hypothesis and conclude that the estimated average treatment effect is not zero for all of our observations.
+
+### Part F
+
+```{r}
+Ys2 <- genouts(Y,Z,ate=ate)   # generate potential outcomes assuming that the true treatment effect for every unit is equal to the estimated ATE
+distout2 <- gendist(Ys2,perms,prob=probs)
+
+ate
+dispdist(distout2,ate)  
+```
+
+The 95% confidence interval for the sample average treatment effect is (1.59, 19.80). This means that the interval (1.59, 19,80) has a 0.95 probability of bracketing the true average treatment effect.
+
+### Part G
+
+```{r}
+YsX <- genouts(Y,Z,ate=ateX)  # generate potential outcomes assuming that the true treatment effect for every unit is equal to the estimated ATE under covariate adjustment
+distoutX2 <- gendist(YsX,perms,X,prob=probs)
+
+ateX
+dispdist(distoutX2,ateX)
+```
+The 95% confidence interval for the sample average treatment effect is (2.208, 8.402). This means that the interval (2.208, 8.402) has a 0.95 probability of bracketing the true average treatment effect. The 95% confidence interval for Part G is definitely narrower than the one we got for Part F. This is because adding the covariate $X_i$ to the regression increased the precision of our estimate.
+
+## Question 5
+
+### Part A
+
+```{r}
+teach <- read.csv("GerberGreenBook_Chapter4_Combined_Table_4_1_4_2.csv")
+
+D <- teach$d1
+Y1 <- teach$y1
+Y0 <- teach$y0
+X <- teach$x
+Y <- Y0*(1-D) + Y1*(D)
+N <- length(D)
+
+#Function getting rid of randomization schemes where correlation between D and X 
+randfun <- function() {
+  teststat <- -1
+  while (teststat < 0.05) { #if sampled treatment assignment shows correlation between covariates and treatment, select another one
+      Zri <- sample(D)
+      teststat <- summary(lm(Zri~X))$coefficients[2,4]
+      }
+      return(Zri)
+    }
+
+
+perms <- genperms.custom(numiter=1000,randfun=randfun)
+probs <- genprob(perms)#Restriction scheme creates different probabilities of assignment = need ipw
+weights <- (1/probs) *D + (1/(1-probs))*(1-D)
+var.weights.treat <- var(weights[D==1])
+var.weights.control <- var(weights[D==0])
+
+var.weights.control
+var.weights.treat
+
+```
+
+The $w_i$ appears to vary within the treatment group and also within the control group. The variance of the weights in the control group is 0.00577 and the variance of the weights in the treatment group is 0.00498. Therefore, the weights appear to vary more within the control group than in the treatment group.
+
+### Part B
+
+```{r}
+set.seed(34980)  
+perms <- genperms.custom(numiter=1000,randfun=randfun)
+probs <- genprob(perms)
+ate <- estate(Y,D,prob=probs)
+Ys <- genouts(Y,D,ate=0)
+distout <- gendist(Ys,perms,prob=probs)
+p.value <- mean(abs(distout) > abs(ate))
+ate
+
+ate <- estate(Y,D,prob=probs)
+Ys <- genouts(Y,D,ate=0)
+distout <- gendist(Ys,perms,prob=probs)#IPW weights are directly included in the RI commands, via the prob argument.
+
+p.value <- mean(abs(distout) > abs(ate))
+ate
+
+p.value
+```
+
+The estimated average treatment effect is 10.68. The number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 8, corresponding to a p-value of 0.008, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the treatment caused any effect (regardless of the direction of the effect).
+
+Our sharp null hypothesis was that $\tau_i$ is equal to 0 for all i. The alternative hypothesis is that $\tau_i$ is not equal to 0 for all i. Given that, our p-value is much lower than 0.05, we have enough evidence to reject the null hypothesis and conclude that the estimated average treatment effect is not zero for all of our observations.
+
+### Part C
+
+```{r}
+set.seed(34980) 
+perms <- genperms.custom(numiter=1000,randfun=randfun)
+probs <- genprob(perms)
+ate_cov <- estate(Y,D,X,prob=probs)
+Ys <- genouts(Y,D,ate=0)
+distout_cov <- gendist(Ys,perms,X,prob=probs)
+p.value_cov <- mean(abs(distout_cov) > abs(ate_cov))
+ate_cov
+
+p.value_cov
+```
+
+
+The estimated average treatment effect is 5.31. The number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 2, corresponding to a p-value of 0.002, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the treatment caused any effect (regardless of the direction of the effect).
+
+Our sharp null hypothesis was that $\tau_i$ is equal to 0 for all i. The alternative hypothesis is that $\tau_i$ is not equal to 0 for all i. Given that, our p-value is much lower than 0.05, we have enough evidence to reject the null hypothesis and conclude that the estimated average treatment effect is not zero for all of our observations.
+
+
+### Part D
+
+```{r}
+set.seed(34980) 
+## Sampling Distributions from 4(d) and 4(e)
+perms_complete_RA <- genperms(D,maxiter=1000)
+
+#Complete random assignment without covariate adjustement
+probs_complete_RA <- genprobexact(D)
+
+ate_complete_RA <- estate(Y,D,prob=probs_complete_RA)
+Ys_complete_RA <- genouts(Y,D,ate=ate_complete_RA)
+
+distout_complete_RA <- gendist(Ys_complete_RA,perms_complete_RA,
+prob=probs_complete_RA)
+
+se_complete_RA <- sd(distout_complete_RA)
+se_complete_RA
+
+#Complete random assignment with covariate adjustement
+ate_cov_complete_RA <- estate(Y,D,X,prob=probs_complete_RA)#just add X here 
+Ys_cov_complete_RA <- genouts(Y,D,ate=ate_cov_complete_RA)
+
+distout_cov_complete_RA <- gendist(Ys_cov_complete_RA,perms_complete_RA,X,
+prob=probs_complete_RA)#just add X here 
+
+se_cov_complete_RA <- sd(distout_cov_complete_RA)
+se_cov_complete_RA
+
+
+## Sampling Distributions from 5(a) and 5(b)
+
+#Restricted random assignment without covariate adjustement
+perms_restricted_RA <- genperms.custom(numiter=1000,randfun=randfun)#just add the randomization function here
+probs_restricted_RA <- genprob(perms_restricted_RA)
+
+ate_restricted_RA <- estate(Y,D,prob=probs_restricted_RA)
+Ys_restricted_RA <- genouts(Y,D,ate=ate_restricted_RA)
+distout_restricted_RA <- gendist(Ys_restricted_RA,perms_restricted_RA,
+prob=probs_restricted_RA)
+se_restricted_RA <- sd(distout_restricted_RA)
+se_restricted_RA
+
+#Restricted random assignment with covariate adjustement
+ate_cov_restricted_RA <- estate(Y,D,X,prob=probs_restricted_RA)
+Ys_cov_restricted_RA <- genouts(Y,D,ate=ate_cov_restricted_RA)
+distout_cov_restricted_RA <- gendist(Ys_cov_restricted_RA,perms_restricted_RA,X,
+prob=probs_restricted_RA)
+se_cov_restricted_RA <- sd(distout_cov_restricted_RA)
+se_cov_restricted_RA
+```
+
+With the complete random assignment procedure, the standard error was 4.742 without covariates and 1.647 with covariates. With the restricted random assignment procedure, the standard error was 4.234 without covariates and 1.599 with covariates. Therefore, the standard errors associated with restricted random assignmend were lower with/without covariate adjustment compared to the standard errors associated with complete random assignment. Likewise, given the SEs were lower, we can say that restricted random assignment produced a sampling distribution of the estimated ATE with a narrower sampling distribution and increased precision of the estimate.
+
+## Question 6
+
+### Part A
+
+```{r}
+russia <- read.dta("russia_subset.dta")
+```
+
+```{r}
+russia <- within(russia,{
+  female <- as.numeric(sexresp6 == "woman")
+  class <- relevel(group6,ref="very poor")
+  church_member <- as.numeric(memberc6=="yes")
+  id <- 1:nrow(russia)
+  class_verypoor <- as.numeric(class=="very poor")
+  class_poor <- as.numeric(class=="poor")
+  class_middle <- as.numeric(class=="middle")
+  class_morethanmiddle <- as.numeric(class=="more than middle")
+})
+
+fit <- lm(index96 ~ index95 + female + church_member + class, data=russia)
+summary(fit)
+```
+The adjusted r-squared for our regression model was 0.3857. The only variable that produced a statistically significant p-value was index95. This means that we do not have enough evidence to conclude that any of the other variables except index95 have coefficient estimates other than zero. Therefore, index95 seems to be the variable that most strongly predicts evaluations of national conditions in 1996.
+
+### Part B
+
+```{r}
+library(blockTools)
+
+#Generate blocks 
+block.out <- block(data = russia, n.tr = 2,
+        id.vars = "id", algorithm="randGreedy",
+        block.vars = c("female", "church_member",
+       "index96","class_verypoor",
+      "class_poor", "class_middle"))
+
+assign.out <- assignment(block.out)
+
+#The commands below check to see which ID numbers appear on the list of assign.out's assignment to Treatment 1
+
+russia$Z_blocked <- as.numeric(russia$id %in%
+    as.numeric(as.character(
+    unlist(assign.out$assg[[1]]["Treatment 1"])))) 
+
+#Can you predict treatment assignment based on blocked variables?
+summary(lm(Z_blocked ~ female + church_member + class + index96,
+data=russia))
+```
+
+None of the coefficient estimates in our linear regression were statistically significant; therefore, we do not have evidence to say that the coefficients estimates are unequal to 0. This is a good thing, because none of these variables allow us to predict the treatment assignment. This also means that blocking produced groups that have the same profile of sex, church membership, social class, and evaluations in 1996.
+
+### Part C and D
+
+```{r}
+set.seed(34980) 
+sims <- 1000
+results <- matrix(NA,sims,3)
+colnames(results) <- c("complete","adjusted","blocked")
+N <- nrow(russia)
+    for(i in 1:sims) {
+    # Complete RA without adjustment
+    russia$Z_complete <- ifelse(1:N %in% sample(N, N/2), 1, 0)
+    results[i,1] <- lm(index97 ~ Z_complete, data=russia)$coefficients[2]
+
+      # Complete RA with adjustment
+      results[i,2] <- lm(index97 ~ Z_complete + female + church_member + class + index96, data=russia)$coefficients[2]
+      
+# Blocked RA, without adjustment
+assign.out <- assignment(block.out) #previously created blocks
+
+russia$Z_blocked <- as.numeric(russia$id %in%
+as.numeric(as.character(
+unlist(assign.out$assg[[1]]["Treatment 1"]))))#extract treatment assignment
+
+results[i,3] <- lm(index97 ~ Z_blocked, data=russia)$coefficients[2]
+}
+
+#use apply() to extract means and SDs for each column (2 refers to columns)
+results_table <- rbind(apply(results,2,mean),apply(results,2,sd))
+rownames(results_table) <- c("Average Estimate", "Standard Error")
+results_table
+```
+
+(Part C) The standard error of the estimated treatment effect using complete random assignment is 0.171. The standard error of the estimated treatment effect using block random assignment is 0.124. This means that the standard error associated with block random assignment was lower than the standard error associated with complete random assignment. Likewise, given the SE was lower, we can say that block random assignment produced a sampling distribution of the estimated ATE with a narrower sampling distribution and increased precision of the estimate compared to complete random assignment. I also would like to mention that both estimates of the treatment effect are unbiased.
+
+(Part D) The standard error of the estimated treatment effect using complete random assignment using regression to control for covariates is 0.133. The standard error of the estimated treatment effect using block random assignment is 0.124. This means that the standard error associated with block random assignment was lower than the standard error associated with complete random assignment. Likewise, given the SE was lower, we can say that block random assignment produced a sampling distribution of the estimated ATE with a narrower sampling distribution and increased precision of the estimate compared to complete random assignment using regression to control for  covariates that would have otherwise been used to form blocks. Even though blocking produces a gain in precision over what is achieved by covariate adjustment, this gain is not as large as the gain over complete random assignment without adjustment. I also would like to mention that both estimates of the treatment effect are unbiased.
+
+
+
+## Question 7
+
+### Part A
+
+```{r}
+a.b.treatment <- c(2,3)
+c.d.control <- c(2,5)
+ate1 <- mean(a.b.treatment) - mean(c.d.control)
+
+a.c.treatment <- c(2,2)
+b.d.control <- c(0, 5)
+ate2 <- mean(a.c.treatment) - mean(b.d.control)
+
+a.d.treatment <- c(2,5)
+b.c.control <- c(0,2)
+ate3 <- mean(a.d.treatment) - mean(b.c.control)
+
+b.c.treatment <- c(3,2)
+a.d.control <- c(1, 5)
+ate4 <- mean(b.c.treatment) - mean(a.d.control)
+
+b.d.treatment <- c(3, 5)
+a.c.control <- c(1, 2)
+ate5 <- mean(b.d.treatment) - mean(a.c.control)
+
+c.d.treatment <- c(2,5)
+a.b.control <- c(1,0)
+ate6 <- mean(c.d.treatment) - mean(a.b.control)
+
+var(c(ate1,ate2,ate3,ate4,ate5,ate6))
+
+```
+The sampling variance of the difference-in-means estimator across all six possible random assignments is 3.4.
+
+### Part B
+
+```{r}
+# ab is a pair and cd is a pair
+
+scheme1.a.c.treatment <- c(2,2)
+scheme1.b.d.control <- c(0,5)
+scheme1.ate1 <- mean(scheme1.a.c.treatment) - mean(scheme1.b.d.control)
+
+scheme1.a.d.treatment <- c(2,5)
+scheme1.b.c.control <- c(0,2)
+scheme1.ate2 <- mean(scheme1.a.d.treatment) - mean(scheme1.b.c.control)
+
+scheme1.b.d.treatment <- c(3,5)
+scheme1.a.c.control <- c(1,2)
+scheme1.ate3 <- mean(scheme1.b.d.treatment) - mean(scheme1.a.c.control)
+
+scheme1.b.c.treatment <- c(3,2)
+scheme1.a.d.control <- c(1,5)
+scheme1.ate4 <- mean(scheme1.b.c.treatment) - mean(scheme1.a.d.control)
+```
+
+```{r}
+#ac is a pair and bd is a pair
+
+scheme2.a.b.treatment <- c(2,3)
+scheme2.c.d.control <- c(2,5)
+scheme2.ate1 <- mean(scheme2.a.b.treatment) - mean(scheme2.c.d.control)
+
+scheme2.a.d.treatment <- c(2,5)
+scheme2.b.c.control <- c(0,2)
+scheme2.ate2 <- mean(scheme2.a.d.treatment) - mean(scheme2.b.c.control)
+
+scheme2.c.d.treatment <- c(2,5)
+scheme2.a.b.control <- c(1,0)
+scheme2.ate3 <- mean(scheme2.c.d.treatment) - mean(scheme2.a.b.control)
+
+scheme2.b.c.treatment <- c(3,2)
+scheme2.a.d.control <- c(1,5)
+scheme2.ate4 <- mean(scheme2.b.c.treatment) - mean(scheme2.a.d.control)
+```
+
+```{r}
+#ad is a pair and bc is a pair
+
+scheme3.a.b.treatment <- c(2,3)
+scheme3.c.d.control <- c(2,5)
+scheme3.ate1 <- mean(scheme3.a.b.treatment) - mean(scheme3.c.d.control)
+
+scheme3.a.c.treatment <- c(2,2)
+scheme3.b.d.control <- c(0,5)
+scheme3.ate2 <- mean(scheme3.a.c.treatment) - mean(scheme3.b.d.control)
+
+scheme3.c.d.treatment <- c(2,5)
+scheme3.a.b.control <- c(1,0)
+scheme3.ate3 <- mean(scheme3.c.d.treatment) - mean(scheme3.a.b.control)
+
+scheme3.b.d.treatment <- c(3,5)
+scheme3.a.c.control <- c(1,2)
+scheme3.ate4 <- mean(scheme3.b.d.treatment) - mean(scheme3.a.c.control)
+```
+
+```{r}
+var(c(
+  scheme1.ate1,
+  scheme1.ate2,
+  scheme1.ate3,
+  scheme1.ate4,
+  scheme2.ate1,
+  scheme2.ate2,
+  scheme2.ate3,
+  scheme2.ate4,
+  scheme3.ate1,
+  scheme3.ate2,
+  scheme3.ate3,
+  scheme3.ate4
+))
+```
+The sampling variance of the difference-in-means estimator across all twelve possible random assignments is 3.09.
+
+### Part C
+
+When we did complete random assignment our sampling variance was 3.4, whereas the sampling variance was 3.09 when we did block random assignment. With randomly created blocks (which implies blocking on a non-prognostic covariate), our sampling variance did not increase; instead, it even decreased a bit. This is because, even when blocks are formed using a covariate that fails to predict experimental outcomes, the estimates remain unbiased and have no more sampling variability than the estimates one would have obtained from a complete randomization. Therefore, it makes sense that the sampling variance did not increase in Part B. Likewise, the reason why it decreased slightly because one or more of our blocking schemes might have actually blocked by a prognostic covariate. All in all, blocking has minimal risks even when blocks are formed by non-prognostic covariates.
+
+## Question 8
+
+### Part A
+
+Given that 500 of subjects were supposed to receive the treatment, we know that the probability of being in the treatment group is 0.5. If a person's name occurs once, then the chance of that person being in the treatment group will also be 0.5.
+
+However, if a person has two names, then the sample space will include (Control/Control, Control/Treatment, Treatment/Treatment, Treatment/Control). Out of these 4 possibilities, 3 of them include the treatment; therefore the probability will be 3/4 or 0.75.
+
+## Part B
+
+
+```{r}
+treatment.size <- 600*0.5 + 200*0.75
+treatment.size
+
+control.size <- 600*0.5 + 200*0.25
+control.size
+```
+
+Therefore, of the 800 unique names, we would expect 450 names to be assigned to treatment and 350 names to control.
+
+## Part C
+
+Given that the chance of being assigned to the treatment is different between these two groups/blocks, we need to use the equation 3.10.
+
+$$ATE = \sum_{j=1}^{J} \frac{N_j}{N} ATE_j$$
+
+## Question 9
+
+### Part A
+
+In Block 1, the apparent effect of being called by a phone bank on voter turnout was an increase of 0.00964 units.
+
+In Block 2, the apparent effect of being called by a phone bank on voter turnout was a decrease of 0.007829 units.
+
+In Block 3, the apparent effect of being called by a phone bank on voter turnout was a decrease of -0.01362 units.
+
+In Block 4, the apparent effect of being called by a phone bank on voter turnout was an increase of 0.008271 units.
+
+### Part B
+
+This comparison gives a biased estimate of the ATE because the probability of being assigned to the treatment block is different in each block.
+
+```{r}
+6935 / (6935+39618) #block1
+7007 / (7007+136074) #block2
+7548 / (7548+581919) #block3
+7229 / (7229+154385) #block4
+```
+
+As you can see, the probability of being assigned to the treatment group is much higher in block 1 compared to the other 3 blocks. Furthermore, we can see that the estimated average treatment effect in block 1 was the largest out of the 4 blocks. Therefore, it would be wrong to combine the 4 blocks when computing the estimated ATE.
+
+### Part C
+
+```{r}
+ate1 <- 0.00964
+ate2 <- -0.007829
+ate3 <- -0.01362
+ate4 <- 0.008271
+
+n <-940715
+
+weight1 <- (6935+39618) / n
+weight2 <- (7007+136074) / n
+weight3 <- (7548+581919) / n
+weight4 <- (7229+154385) / n
+
+(ate1*weight1)+(ate2*weight2)+(ate3*weight3)+(ate4*weight4)
+```
+### Part D
+
+```{r}
+weight1
+weight2
+weight3
+weight4
+```
+
+For block 1, the weight used in Part C was 0.04948683. However, the weight used by OLS was 0.219216. Therefore, the weight used by the OLS was much higher than the weight we used in Part C.
+
+For block 2, the weight used in Part C was 0.1520981. However, the weight used by OLS was 0.2475177. Therefore, the weight used by the OLS was higher than the weight we used in Part C.
+
+For block 3, the weight used in Part C was 0.6266159. However, the weight used by OLS was 0.276768. Therefore, the weight used by the OLS was much lower than the weight we used in Part C.
+
+For block 4, the weight used in Part C was 0.1717991. However, the weight used by OLS was 0.256498. Therefore, the weight used by the OLS was higher than the weight we used in Part C.
+
+All in all, the OLS weight was higher than the weight we calculated in Part C, except for block 3, whose weight in Part C was the highest because of its large sample size. This means that OLS produces weights that are significantly different than the one that equation 3.10 produces.
+
+### Part E
+
+```{r}
+df <- read.dta("Iowa and Michigan phone mobilization study (Gerber and Green 2005).dta")
+
+## Identify key variables
+Y <- df$vote02
+block <- df$strata
+Z <- df$treat2
+
+## Get probability of treatment assignment for each block
+probs <- genprobexact(Z = Z, blockvar = block)
+
+## This code does the above faster
+# block.pr <- tapply(Z, block, mean)
+
+# Set up vector of weights
+w <- rep(NA, length(Y))
+
+# Loop over number of unique blocks
+for (i in 1:length(w)){
+  # calculate IPW
+  # NOTE: switching equation needed because weights different for treatment and
+  # control observations!
+  w[i] <- (1/probs[i]) * Z[i] + (1/(1 - probs[i])) * (1-Z[i])
+}
+
+## Final step -- use weights in linear regression model using 
+summary(lm(formula = Y ~ Z, weights = w ))
+```
+
+
+For the coefficient estimate of Z we got -0.0078280, which is the weighted estimated average treatment effect. This is the same value as we got in Part C.
+
+## Question 10
+
+### Part A
+
+```{r}
+kansas <- read.dta("Chapter 4_Arceneaux (2005) Dataset.dta")
+```
+
+```{r}
+set.seed(1234567) 
+Z <-  kansas$treatmen
+Y <- kansas$vote03
+clust <- kansas$unit
+
+covs <- as.matrix(kansas[,2:21])  # covariates are past voter turnout
+
+probs <- genprobexact(Z,clustvar=clust)  # subjects are clustered by precinct
+
+numiter <- 1000
+
+perms <- genperms(Z,maxiter=numiter,clustvar=clust)    # clustered assignment
+numiter <- ncol(perms)  # reset numiter so that it is no larger than the maximum number of possible randomizations
+
+## Part (a)
+# RI for the effect of the covariate on the treatment
+# Use F-test to assess the null hypothesis that the covariates predict random assignment (Z) no better than would be expected by chance
+
+Fstat <- summary(lm(Z~covs))$fstatistic[1]   # F-statistic from actual data
+
+Fstatstore <- rep(NA,numiter)
+
+for (i in 1:numiter) {
+	Fstatstore[i] <- summary(lm(perms[,i]~covs))$fstatistic[1]   # F-statistic under the null of random assignment of Z
+	}
+
+mean(Fstatstore >= Fstat)
+```
+
+
+The p-value is equal to 0.918, which is much higher than the conventional 0.05 threshold. The null hypothesis was that the covariates were the same between the two experimental conditions and that there exists covariate balance. The alternative hypothesis is that the covariates were different between the two experimental conditions and that there exists covariate imbalance. Therefore, we cannot reject the null hypothesis that the covariates are same for the two experimental conditions. Therefore, we can say that the covariates are balanced.
+
+### Part B
+
+```{r}
+ate <- estate(Y,Z,X=covs,prob=probs)
+
+Ys <- genouts(Y,Z,ate=0)
+
+distout <- gendist(Ys,perms,X=covs,prob=probs)
+
+ate                                  # estimated ATE
+sum(distout <= ate)                  # one-tailed comparison
+sum(abs(distout) >= abs(ate))        # two-tailed comparison
+
+dispdist(distout,ate) 
+```
+
+The estimated average treatment effect was 0.05596. Hence, the treatment increased voter turnout by 0.05596 units.
+
+The number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 3, corresponding to a p-value of 0.003, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the treatment caused any effect (regardless of the direction of the effect).
+
+Our sharp null hypothesis was that $\tau_i$ is equal to 0 for all i. The alternative hypothesis is that $\tau_i$ is not equal to 0 for all i. Given that, our p-value is much lower than 0.05, we have enough evidence to reject the null hypothesis and conclude that the estimated average treatment effect is not zero for all of our observations.
+
+### Part C
+
+```{r}
+ateHT <- estate(Y,Z,prob=probs,HT=TRUE)
+ateHT
+```
+The estimated average treatment effect using equation 3.24 is 0.05395387. Hence, according to this equation, the treatment increased voter turnout by 0.05395 units.
+
+### Part D
+
+```{r}
+set.seed(1234567) 
+distoutHT <- gendist(Ys,perms,prob=probs,HT=TRUE)
+
+ateHT                                # estimated difference-in-totals
+sum(distoutHT <= ateHT)             
+sum(abs(distoutHT) >= abs(ateHT))
+
+dispdist(distoutHT,ateHT)  
+```
+
+The estimated average treatment effect using equation 3.24 was 0.05395. Hence, the treatment increased voter turnout by 0.05395 units.
+
+The number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 400, corresponding to a p-value of 0.4, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the treatment caused any effect (regardless of the direction of the effect).
+
+Our sharp null hypothesis was that $\tau_i$ is equal to 0 for all i. The alternative hypothesis is that $\tau_i$ is not equal to 0 for all i. Given that, our p-value is much higher than 0.05, we do not have enough evidence to reject the null hypothesis. We conclude that the estimated average treatment effect is zero for all of our observations.
+
+### Part E
+
+```{r}
+Ypre <- rowMeans(covs)               # use average turnout in past elections as a covariate that will be considered a "pretest" and subtracted from Y
+
+ateHT2 <- estate(Y,Z,Ypre=Ypre,prob=probs,HT=TRUE)  # difference-in-differenced totals
+
+distoutHT2 <- gendist(Ys,perms,Ypre=Ypre,prob=probs,HT=TRUE)
+
+ateHT2
+sum(distoutHT2 <= ateHT2)
+sum(abs(distoutHT2) >= abs(ateHT2))
+
+dispdist(distoutHT2,ateHT2)
+```
+
+The estimated average treatment effect using equation 3.24 and the differenced outcome was 0.04874382. Hence, the treatment increased voter turnout by 0.04874382 units.
+
+The number of simulated ATEs that were as large in absolute value as the actual estimated ATE is 27, corresponding to a p-value of 0.027, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the treatment caused any effect (regardless of the direction of the effect).
+
+Our sharp null hypothesis was that that $\tau_i$ is equal to 0 for all i. The alternative hypothesis is that $\tau_i$ is not equal to 0 for all i. Given that, our p-value is much lower than 0.05, we have enough evidence to reject the null hypothesis and conclude that the estimated average treatment effect is not zero for all of our observations.

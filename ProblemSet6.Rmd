@@ -1,0 +1,341 @@
+---
+title: "Problem Set 6"
+author: "Kerem Tuncer"
+date: "11/10/2021"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+## Question 1
+
+$E[Y_i(d(1))|D_i = 1)]$ means the expected treatment assignment outcome for those who would be treated under some hypothetical allocation of treatments.
+
+$E[Y_i(d(1))|d_i(1) = 1]$ means the expected treatment assignment outcome for those who were assigned to the treatment group and received the treatment. Likewise, we can also say that it is the expected treatment assignment for always-takers and compliers.
+
+$E[Y_i(d(1))|d_i(1) = d_i(0) = 1]$ means the expected treatment assignment outcome for always-takers.
+
+All three expressions discuss the the expected treatment assignment outcome. However, they include different latent types. The first one mentions the outcome among those assigned to the treatment group under a hypothetical allocation of treatments. Whereas, the second and the third expression have the small letter d, meaning that the latent type includes a treatment that was actually administered. Furthermore, the second expression can include both always-takers and compliers as a latent type, whereas the third expression only has always-takers as a latent type.
+
+## Question 2
+
+The expression on the left is $E[Y_i(d(1))|d_i(1) = d_i(0) = 0]$ which is the potential treatment assignment outcome among never-takers. The expression on the right is $E[Y_i(d(0))|d_i(1) = d_i(0) = 0]$ which is the potential control assignment outcome among never-takers. Given that never-takers will produce the same outcomes no matter which experimental condition they are assigned to, their $Y_i(d(1))$ will always be the same as $Y_i(d(0))$. In other words, even if never-takers are assigned to the treatment group, they will always be producing the same outcome even if they were assigned to the control group. We know that this equation as a whole represents the ITT among the never-takers, so we can also say that their ITT will always be zero.
+
+## Question 3
+
+### Part A
+
+Among Compliers, the ITT will equal the ATE. As you know, the ITT is a measure of the average effect of experimental assignment on outcomes. Given that for compliers $d_i(1) = 1$ and $d_i(0) = 0$, their potential treated outcome will be the same as the outcome they produce when they are assigned to the treatment group. Likewise, their untreated potential outcomes will be the same as the outcome they produce when they are assigned to the control group. Therefore, their measure of the average effect of experimental assignment will be the same as their measure of the average treatment effect. The statement is true.
+
+
+### Part B
+
+Among defiers, the ITT will be equal to the -1 times the ATE. Given that for defiers $d_i(1) = 0$ and $d_i(0) = 1$, their potential treated outcome will be the same as the outcome they produce when assigned to the control group. Likewise, their untreated potential outcomes will be the same as the outcome they produce when they are assigned to the treatment group. Therefore, their measure of the average effect of experimental assignment will be the negative (so, times -1) as their measure of the average treatment effect. The statement is false.
+
+### Part C
+
+Among always-takers and never-takers, the ITT and the ATE will be equal to 0. Let's first start by looking at always-takers. Given that for always-takers $d_i(1) = 1$ and $d_i(0) = 1$, the outcome when assigned to the treatment group will be the same as the outcome they produce when assigned to the control group. This is because they will always be revealing their treated potential outcome. Hence, the ITT will be zero. However, we also know that these individuals will never be revealing their untreated potential outcomes. So, we do not have any way of knowing what value their ATE will take.
+
+Given that for never-takers $d_i(1) = 0$ and $d_i(0) = 0$, the outcome when assigned to the treatment group wull be the same as the outcome they produce when assigned to the control group. This is because they will always be revealing their untreated potential outcome. Hence, the ITT will be zero. However, we also know that these individuals will never be revealing their treated potential outcomes. So, we do not have any way of knowing what value their ATE will take.
+
+All in all, this statement is false because the ATT is unknown.
+
+## Question 4
+
+Under two-sided non-compliance, we have to define each of the latent group's $d_i(1)$ and $d_i(0)$. So, if we were to use the definition of compliers in question 4 (those who take the treatment if assigned to the treatment), then we would only have information about what their $d_i(1)$ is equal to, but we would not have any information about what their $d_i(0)$ is equal to. This means that we would not know whether their $d_i(0)$ is equal to 0 or 1. However, according to Box 6.1, compliers under two-sided non-compliance need to have $d_i(0) = 0$. Therefore, a more correct way to say would be compliers are those who take the treatment if and only if assigned to the treatment.
+
+## Question 5
+
+According to equation 6.19, the $ITT_D$ has the following formula;
+
+$$\pi_C - \pi_D$$
+Given that both $\pi_C$ and $\pi_D$ are equal to zero, the $ITT_D$ will also be equal to zero.
+
+## Question 6
+
+Let's first take a look at equation 6.20.
+
+$$\frac{ITT}{ITT_D} = \frac{(ATE|Compliers)*\pi_C-(ATE|Defiers)*\pi_D}{\pi_C - \pi_D}$$
+
+For this equation to equal the CACE, we would first need $\pi_C$ and $\pi_D$ to have different values. This is because if they are equal to each other, then $\pi_C - \pi_D$ will be equal to zero. However, given that $\pi_C - \pi_D$ is in the denominator, the $\frac{ITT}{ITT_D}$ will be undefined if $\pi_C - \pi_D$ is equal to zero.
+
+On the other hand, the defiers and the compliers also have to have the same average treatment effect for the above equation to equal the CACE. This can be seen from the steps below;
+
+$$\frac{ITT}{ITT_D} = \frac{(ATE|Compliers) * (\pi_C-\pi_D)}{\pi_C - \pi_D}$$
+
+
+$$\frac{ITT}{ITT_D} = (ATE|Compliers)$$
+
+Now, let's take a look at the original CACE equation (6.12).
+
+$$\frac{ITT}{ITT_D} = E[(Y_i(1)-Y_i(0))|d_i(1) - d_i(0) = 1]$$
+
+We know that the right side of the equation is the definition of compliers. This means that $d_i(1) - d_i(0) = 1$ can be written as "Compliers."
+
+Then, we also know that $E[Y_i(1) - Y_i(0)]$ refers to the ATE. This means that we can write ATE instead.
+
+So, equation 6.12 can be written like so;
+
+$$\frac{ITT}{ITT_D} = (ATE|Compliers)$$
+
+This is equality is the exact one we found when we assumed that $\pi_C \neq \pi_D$ and $(ATE | Compliers) = (ATE|Defiers)$ for equation 6.20.
+
+## Question 7
+
+In chapter 5, while reviewing one-sided non-compliance, we defined compliers as those who received the treatment and were in the treatment group. In other words, only Compliers received the treatment and that Compliers were noted as $d_i(1) = 1$. Therefore, we had the following equation for the CACE (5.17).
+
+$$CACE = E[Y_i(d = 1) - Y_i(d = 0) | d_i(1) = 1]$$
+
+The condition of the equation, which is $d_i(1) = 1$ means that we are only interested in compliers - those who received the treatment and were in the treatment group. Furthermore, the left side of the equation, which is $E[Y_i(d = 1) - Y_i(d = 0)]$, denoted the ATE.
+
+Given that only compliers received the treatment, the above equation had to equal the ATT, which is the ATE among subjects who receive the treatment.
+
+However, under two-sided non-compliance, we have a different definition for Compliers. These are subjects receive the treatment when assigned to the treatment group and do not receive the treatment when assigned to the control group. Therefore, the equation for the CACE has changed.
+
+$$CACE = E[Y_i(d = 1) - Y_i(d = 0) | d_i(1) - d_i(0) = 1]$$
+The condition of the equation, which is $d_i(1) - d_i(0) = 1$ means that we are interested in both the treatment group participants who received the treatment and also the control group participants who did not receive the treatment. This means that $d_i(1) = 1 \neq d_i(1) - d_i(0) = 1$. Therefore, with two-sided non-compliance, the CACE will also include the average treatment effect of those who did not receive the treatment and were assigned to the control group. Consequently, this value has to be different than the ATE among subjects who receive the treatment (ATT).
+
+## Question 8
+
+### Part A
+
+Non-interference presumes that subjects’ potential outcomes are unaffected by the assignment or treatment of other subjects. In this application, continuation of domestic violence is assumed to respond to each subject’s own actual treatment, which was either arrest or warning, and not to anyone else's. Given that domestic violence is an action that occurs in private households, it is unlikely that there will be communication between the perpetrators. Additionally, in criminology, there is a common spill-over effect of increased enforcement causing crime to displace to other areas. However, domestic violence is not a type of crime where the perpetrator would give much thought to the amount of policing occuring in the neighborhood. Therefore, I do not think that non-interference was an issue in this study.
+
+Excludability requires that the receipt of the treatment (warning or arrest) is the only causal agent that influences domestic violence. It is unlikely that there were asymmetries in the measurement of outcomes because calls to the hotline to report the perpetrator or the later arrest of the perpetrator are very straight-forward events. On the other hand, this assumption could have been violated if the random assignment affected the outcomes. For example, if those that had the arrest treatment were shown on local news, then the excludability assumption would have broken down. However, as long as the domestic violence incident was not too violent, it is unlikely that this was the case.
+
+The monotonicity assumption implies that there are no defiers - subjects who receive the treatment when assigned to the control group and do not receive the treatment when assigned to the treatment group. In this application, the monotonicity assumption means that there were no individuals who would only get a warning when they were supposed to get arrested and no individuals who would only get arrested when they were supposed to get a warning. It is impossible for domestic violence perpetrators to get a warning when assigned to the arrest condition. This is because the police officers had already decided before-hand that they would be arrested for the sake of the experiment. Likewise, it is illogical for someone to get arrested only if they were given a warning. Therefore, the monotonicity assumption will hold for this experiment.
+
+
+### Part B
+
+```{r}
+a <- (400 + 1 + 13 + 384) / (404+398)
+b <- 2/398
+ITT_D <- a-b
+ITT_D
+```
+
+```{r}
+a <- (296 + 301) / (404 + 398)
+b <- 261 / 398
+ITT1 <- a - b
+ITT1
+
+a <- (146 + 157) / (404 + 398)
+b <- 151 / 398
+ITT2 <- a - b
+ITT2
+```
+
+```{r}
+CACE1 <- ITT1 / ITT_D
+CACE2 <- ITT2 / ITT_D
+CACE1
+CACE2
+```
+
+The ITT_D was 0.9899873. Assuming monotonicity, the ITT_D indicates the proportion of the subjects who are Compliers, which is estimated to be 0.9899873. On the other hand, the ITT for report calls was 0.08861013, which is the difference between the proportion of subjects who were reported in the treatment group and the proportion of subjects who were reported in the control group. The ITT for subsequent arrests was -0.001591499. This is the difference between the proportion of subjects who were subsequently arreated in the treatment group and the proportion of subjects who were subsequently arrested in the control group.
+
+The CACE for report calls was 0.08950633. The estimated average treatment effect of the arrests among Compliers is a 0.08950633 percentage point increase in the probability of getting subsequently reported to the hotline.
+
+The CACE for subsequent arrests was -0.001607595. The estimated average treatment effect of the arrests among Compliers is a 0.001607595 percentage point decrease in the probability of getting subsequently arrested.
+
+### Part C
+
+If we did not assume monotonicity, then the $\pi_C$ would not change because the existence of defiers does not change the proportion of compliers. However, the proportion of always-takers would decrease because we would learn that some of the always-takers were actually defiers. Likewise, the proportion of never-takers would also decrease because we would learn that some of the never-takers were actually defiers.
+
+### Part D
+
+This will be a permutation with replacement. 3^3 is equal to 27. There will be a total of 27 different latent types.
+
+### Part E
+
+(i) There will be a total of 27 - 8 = 19 types.
+
+(ii) There will be a total 27 - 6 = 21 types.
+
+(iii) There will be a total 27 - 6 = 21 types.
+
+(iv) There will be a total of 27 - 10 = 17 types.
+
+## Question 9
+
+### Part A
+
+Assuming monotonicity, the ITT_D indicates the proportion of the subjects who are Compliers, which is estimated to be 0.6587. Given that the standard error was 0.0012, we can say that the standard deviation of the sampling distribution of the ITT_D was 0.0012.
+
+On the other hand, the ITT was estimated to be 0.0018, which is the difference between the proportion of subjects who had a criminal record in the treatment group and the proportion of subjects who had a criminal record in the control group. Given that the standard error was 0.0006, we can say that the standard deviation of the sampling distribution of the ITT was 0.0006.
+
+Lastly, the estimated average treatment effect of conscription among Compliers is a 0.0026 percentage point increase in the probability of criminal prosecution with military service. Given that the standard error was 0.0008, we can say that the standard deviation of the sampling distribution of the CACE was 0.0008.
+
+### Part B
+
+```{r}
+1-0.6587-0.0421
+```
+All three proportions need to add up to 1. The ITT_D was 0.6587. So, the proportion of compliers is 0.6587. The authors note that 4.21% of subjects who were not draft eligible nevertheless served in the armed forces. So, the proportion of always-takers was 0.0421. Lastly, the proportion of never-takers will be $1-\pi_C-\pi_{AT}$ which is 0.2992.
+
+### Part C
+
+Non-interference presumes that subjects’ potential outcomes are unaffected by the assignment or treatment of other subjects. In this application, criminal activity is assumed to respond to each subject’s own draft eligibility and military service, and not anyone else’s. Given that draft eligibility is used usely defined by a strict criteria, it is unlikely that one's draft eligibility will impact someone else's criminal activity. However, one's military service may affect the criminal activity of other subjects. Given that these men are around the same age, it is likely that some of them will be friends and will be communicating with each other. It is quite likely that there will be groups of friends where some of them had served in the military and some of them had not. The military service of those who served may cause themselves to be more violent and likely to conduct criminal activity. As you know, you are more likely to be criminal if those around you are also criminals. Therefore, non-interference assumption might be violated in this case. As a result, the spillover of aggressiveness/violence from those who served to those who did not could result in an downward bias of the CACE.
+
+Excludability requires that assigned draft eligibility influences criminal activity only through militart service.  This assumption would be violated if draft eligibility affected criminal activity for reasons other than military service. I cannot think of reasons why draft eligibility would affect criminal activity for any other reason other than military service. Draft eligibility is a rather well-defined and straight-forward process that should not really cause any change in emotions/characteristics or likeliness to commit crime among the subjects.
+
+Monotonicity presupposes that being drafted will never cause someone who would otherwise do military service to not do military service. This is a logical assumption because no one will say that they will go to military service if and only if they are not drafted. Likewise, no one will say that they will not go to military service if and only if they are drafted. Given the irrationality of these statements, we can assume monotonicity.
+
+## Question 10
+
+### Part A
+
+The monotonicity assumption implies that there are no defiers - subjects who receive the treatment when assigned to the control group and do not receive the treatment when assigned to the treatment group. In this application, the monotonicity assumption means that there were no polling stations that would only get monitored when they were not supposed to get monitored and polling stations that would not get monitored when they were supposed to get monitored. Given the irrationality of these statements, we can assume monotonicity.
+
+### Part B
+
+```{r}
+a <- 68/409
+b <- 21 / 1562
+compliers.prop <- a - b
+compliers.prop
+```
+
+I would estimate the proportion of compliers to be 0.1528149.
+
+```{r}
+at.prop <- 21 / 1562
+```
+
+The estimated proportion of always-takers is 0.0134443.
+
+```{r}
+1 - compliers.prop - at.prop
+```
+
+I would estimate the proportion of never-takers to be 0.8337408.
+
+### Part C
+
+Non-interference presumes that subjects’ potential outcomes are unaffected by the assignment or treatment of other subjects. In this application, the number of ballots that were declared invalid in a polling station is assumed to respond to each polling station’s own monitoring (or lack of monitoring), and not anyone else’s. It is unlikely that the number of invalid ballots in a given polling station would change because of the treatment assignment of another polling station. Therefore, the non-interference assumption is assumed for this study.
+
+### Part D
+
+```{r}
+library(ri)         # load the RI package
+library(foreign)    # package allows R to read Stata datasets
+set.seed(1234567) 
+hyde <- read.dta("Problem 6.10 Hyde.dta")
+
+#### Problem 6.10d ####
+
+# monitoring treatment assignment
+Z <- as.integer(hyde$Sample) -1  
+
+# monitoring treatment received
+D <- as.numeric(hyde$observed=="yes")
+
+# Outcome variable is invalid ballots
+Y <- hyde$invalidballots
+
+# generate probability of treatment assignment
+probs <- genprobexact(Z)  
+
+# estimate the ITT (ATE of assignment on outcome)
+ITT <- estate(Y,Z,prob=probs) 
+
+# estimate the ITTd (ATE of assignment on treatment receipt)
+ITTd <- estate(D,Z,prob=probs) 
+
+# Estimate the CACE
+CACE <- ITT/ITTd
+ITT
+CACE
+```
+
+The estimated ITT is 4.824097. which is the difference between the number of ballots that were declared invalid by polling station officials in the treatment group and the number of ballots that were declared invalid by polling station officials in the control group.
+
+The estimated CACE is 31.56824. The estimated average treatment effect of the election monitoring among Compliers is a 31.56824 point increase in the number of ballots that were declared invalid.
+
+### Part E
+
+```{r}
+set.seed(1234567)
+# Generate permutation matrix
+perms <- genperms(Z,maxiter=10000)  
+
+# Generate outcomes under sharp null
+Ys <- genouts(Y,Z,ate=0)   
+
+# Generate sampling distribution under sharp null
+distout <- gendist(Ys,perms,prob=probs) 
+
+# Two-sided p-value
+p.value.twosided <- mean(abs(distout) >= abs(ITT))
+p.value.twosided
+
+```
+
+The number of simulated ITTs that were as large in absolute value as the actual estimated ATE is 4893, corresponding to a p-value of 0.4893, for the two-tailed test. We are using the two-tailed test because we are interested in seeing if the intent to treat caused any effect (regardless of the direction of the effect).
+
+Our sharp null hypothesis was that that ITT is equal to 0 for all i. The alternative hypothesis is that ITT is not equal to 0 for all i. Given that, our p-value is much higher than 0.05, we do not have enough evidence to reject the null hypothesis. We conclude that the estimated ITT is zero for all of our observations.
+
+Testing the null hypothesis that the ITT is zero for all subjects serves the same purpose as testing the null hypothesis that the ATE is zero for all Compliers because if we cannot reject the null for the ITT then we should not be able to reject it for the CACE, as well.
+
+## Question 11
+
+### Part A
+
+```{r}
+ITT_D <- 0.798 - 0.139
+ITT <- 365 - 360.5
+CACE = ITT / ITT_D
+CACE
+```
+The estimated CACE is 6.828528.
+
+### Part B
+
+```{r}
+ITT_D <- 0.798 - 0.139
+ITT <- 447.7 - 449
+CACE = ITT / ITT_D
+CACE
+```
+
+The estimated CACE is -1.972686.
+
+### Part C
+
+```{r}
+Z <- c(rep(1, 1253), rep(0, 6151))
+D <- c(rep(1, 1000), rep(0, 253), rep(1, 855), rep(0, 5296))
+Y <- c(rep(447.7, 1253), rep(449.0, 6151)) #first grade akils
+Y_2 <- c(rep(365.0, 1253), rep(360.5, 6151)) #pre academic skills
+
+
+# Regression Estimate of the ITT_D
+out.lm <- lm(Y_2 ~ Z)
+summary(out.lm)
+
+ITTd <- coef(out.lm)[2]
+
+# Regression Estimate of the ITT
+out.lm <- lm(Y ~ Z)
+summary(out.lm)
+
+ITT <- coef(out.lm)[2]
+
+ITT/ITTd
+```
+
+The estimated average downstream effect of pre-academic skills on first grade academic skills is -0.2888889. A point increase in pre-academic skills will result in a 0.2888889 point decrease in first grade academic skills among compliers.
+
+Random assignment implies that assignment is unrelated to potential outcomes. This assumption may be satisfied by random assignment when the experiment is launched, but subjects may drop out of the study over time. However, we are not told that any students dropped from the study, so we can assume that this assumption is satisfied.
+
+Non-interference presumes that subjects’ potential outcomes are unaffected by the assignment or treatment of other subjects.  In this application, first grade academic skills is assumed to respond to each subject’s own enrollment in Head Start and pre-academic skills, and not anyone else’s. I am not really sure if this study was conducted among children from different school districts or from the same school districts. If they are from different school districts, it is unlikely that non-interference was violated. However, if they were from the same school district, then there could have been communication among the subjects. With communication, we can say that treated participants could have given some of their knowledge to their untreated friends. If this was the case, then the estimated average downstream effect will be underestimated.
+
+Monotonicity presupposes that the head start program will not cause someone who would otherwise do well in the pre-academic skills test to do bad in the pre-academic skills test. It would be irrational to say that there will be students who will only do well if and only if they are not assigned to the head start program. Likewise, it would be irrational to say that there will be students who will only do bad if and only if they are assigned to the head start program. Therefore, monotonicity is assumed.
+
+Lastly, excludability requires that assigned head start program influences the first grade test score only through the pre-academic score. However, I can think of cases where the assigned head start program can influence first grade test score through other means. For example, those assigned to enroll in head start become more self-confident just because they are in an enrichment program. Then, this self-confidence might allow them do to better in the first grade test. Therefore, it is possible that excludability could have been violated. If this is the case, the estimated average downstream effect will be overestimated.
+
+
+
+
